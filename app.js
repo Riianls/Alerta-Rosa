@@ -1,16 +1,15 @@
-
 /* ==========================================
    ALERTA ROSA — JAVASCRIPT
    JavaScript puro, sem dependências
 ========================================== */
 
-// IMPORTANTE: substitua pelo e-mail verdadeiro.
-const CONTACT_EMAIL = "contato@seudominio.com.br";
-
-const HOLD_MS = 2000;
-
 (() => {
   "use strict";
+
+  // IMPORTANTE: substitua pelo e-mail verdadeiro.
+  const CONTACT_EMAIL = "contato@seudominio.com.br";
+
+  const HOLD_MS = 2000;
 
   const $ = (selector) => document.querySelector(selector);
   const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -68,14 +67,17 @@ const HOLD_MS = 2000;
   const quickExitButton = $("#quickExit");
 
   if (quickExitButton) {
-    quickExitButton.addEventListener("click", quickExit);
+    quickExitButton.addEventListener("click", (event) => {
+      event.preventDefault();
+      quickExit();
+    });
   }
 
   let escCount = 0;
   let escTimer;
 
   document.addEventListener("keydown", (event) => {
-    if (event.key !== "Escape") return;
+    if (event.key !== "Escape" || event.repeat) return;
 
     escCount++;
 
@@ -99,6 +101,7 @@ const HOLD_MS = 2000;
   const label = $("#sosLabel");
   const live = $("#sosLive");
   const reset = $("#demoReset");
+  const callBox = $("#demoCall");
   const steps = $$("#demoSteps li");
 
   if (sos && label && live && reset) {
@@ -132,6 +135,10 @@ const HOLD_MS = 2000;
         const timer = setTimeout(() => {
           li.classList.add("done");
 
+          if (index === steps.length - 1 && callBox) {
+            callBox.hidden = false;
+          }
+
           say(
             li.textContent +
             (
@@ -148,10 +155,7 @@ const HOLD_MS = 2000;
     };
 
     const tick = (now) => {
-      const progress = Math.min(
-        (now - t0) / HOLD_MS,
-        1
-      );
+      const progress = Math.max(0, Math.min((now - t0) / HOLD_MS, 1));
 
       setP(progress * 100);
 
@@ -201,6 +205,8 @@ const HOLD_MS = 2000;
       setP(0);
 
       reset.hidden = true;
+
+      if (callBox) callBox.hidden = true;
 
       say("Simulação cancelada.");
     };
