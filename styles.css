@@ -1,4 +1,3 @@
-
 /* ==========================================
    ALERTA ROSA — FOLHA DE ESTILOS COMPLETA
 ========================================== */
@@ -90,10 +89,27 @@ section {
   box-shadow: 0 0 0 6px #fff;
 }
 
-.dark :focus-visible {
+.dark :focus-visible,
+.nav :focus-visible,
+.bar p a:focus-visible,
+footer :focus-visible {
   outline-color: var(--pink);
   box-shadow: none;
 }
+
+.skip {
+  position: absolute;
+  left: 12px;
+  top: -60px;
+  z-index: 100;
+  background: #fff;
+  color: #000;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 8px;
+}
+
+.skip:focus { top: 12px; }
 
 .i {
   width: 1.6rem;
@@ -160,15 +176,23 @@ section {
 
 .bar p { margin: 0; }
 .bar a { color: var(--pink); font-weight: 600; }
+.bar p a { text-decoration: underline; text-underline-offset: 3px; }
 
-.quick {
+/* Saída rápida: sempre visível, mesmo com a página rolada */
+.bar .quick {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 50;
   background: #fff;
   color: #000;
-  border: 0;
-  border-radius: 6px;
-  padding: 5px 12px;
-  font: 600 .85rem var(--f);
+  border: 2px solid #000;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font: 600 .9rem var(--f);
+  text-decoration: none;
   cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,.4);
 }
 
 /* NAVEGAÇÃO */
@@ -202,7 +226,7 @@ section {
 
 #menu {
   display: flex;
-  gap: 22px;
+  gap: 18px;
   align-items: center;
   list-style: none;
 }
@@ -241,6 +265,10 @@ section {
   gap: 40px;
   align-items: center;
 }
+
+/* colunas no desktop (o breakpoint de 800px volta para 1 coluna) */
+.hero-grid { grid-template-columns: minmax(0, 1.25fr) minmax(0, .75fr); }
+.split, .demo { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
 .cta {
   display: flex;
@@ -403,6 +431,18 @@ section {
   padding: 20px 0;
 }
 
+.sos-hint { margin: 28px auto 0; }
+
+.demo-call {
+  background: #fff;
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  padding: 10px 14px;
+  max-width: none;
+}
+
+.demo-call a { font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+
 .sos {
   --p: 0;
   position: relative;
@@ -417,6 +457,8 @@ section {
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
   transition: transform .15s;
 }
 
@@ -477,6 +519,14 @@ section {
 .row h3 .i { color: var(--pink-d); }
 .row p { margin: 0; font-size: .95rem; color: var(--mut); }
 .row .tag { margin: 0; justify-self: start; }
+.row .lim { color: var(--pink-d); }
+
+@media (min-width: 801px) {
+  .row {
+    grid-template-columns: 1.1fr 1.3fr 1.4fr auto;
+    align-items: start;
+  }
+}
 
 /* FLUXO */
 
@@ -841,9 +891,11 @@ code {
 footer {
   background: var(--ink);
   color: #d4d4da;
-  padding: 25px 0;
+  padding: 25px 0 72px; /* espaço para o botão Saída rápida fixo */
   text-align: center;
 }
+
+footer a { color: var(--pink); text-decoration: underline; text-underline-offset: 3px; }
 
 footer p {
   max-width: none;
