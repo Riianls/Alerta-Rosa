@@ -222,13 +222,13 @@ footer :focus-visible {
   color: #fff;
 }
 
-.brand b, .brand .i { color: var(--pink); }
+.brand b { color: var(--pink); }
 
-#menu {
-  display: flex;
-  gap: 18px;
-  align-items: center;
-  list-style: none;
+.brand-logo {
+  display: block;
+  width: 46px;
+  height: 46px;
+   
 }
 
 #menu a:not(.btn) {
