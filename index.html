@@ -6,11 +6,19 @@
 <title>Alerta Rosa — proteção, privacidade e acolhimento</title>
 <meta name="description" content="Alerta Rosa: plataforma tecnológica em desenvolvimento para proteger mulheres, crianças e adolescentes em situação de vulnerabilidade.">
 <meta name="theme-color" content="#000000">
+<meta name="referrer" content="no-referrer">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:title" content="Alerta Rosa — proteção, privacidade e acolhimento">
+<meta property="og:description" content="Plataforma em desenvolvimento para proteger mulheres, crianças e adolescentes.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff3d8b' d='M12 2l9 3v7c0 5-4 8.5-9 10-5-1.5-9-5-9-10V5z'/%3E%3C/svg%3E">
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<a class="skip" href="#main">Pular para o conteúdo</a>
 <!-- Ícones (sprite SVG) -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
 <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></symbol>
@@ -29,18 +37,18 @@
 
 <div class="bar" role="region" aria-label="Aviso de emergência">
   <p><strong>Em perigo agora?</strong> Ligue <a href="tel:190">190</a>. Mulheres: <a href="tel:180">180</a>. Crianças e adolescentes: <a href="tel:100">100</a>.</p>
-  <button class="quick" id="quickExit" type="button" title="Sai deste site (ou aperte Esc duas vezes)">Saída rápida</button>
+  <a class="quick" id="quickExit" href="https://www.google.com.br/" rel="noopener noreferrer" title="Sai deste site (ou aperte Esc duas vezes)">Saída rápida</a>
 </div>
 
 <header class="nav"><div class="wrap">
-  <a class="brand" href="#inicio"><svg class="i"><use href="#i-shield"/></svg>Alerta<b>Rosa</b></a>
+  <a class="brand" href="#inicio"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-shield"/></svg><span>Alerta<b>Rosa</b></span></a>
   <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir menu">☰</button>
   <nav id="menu" aria-label="Principal">
-    <a href="#proposito">Propósito</a><a href="#funcionalidades">Recursos</a><a href="#demo">Demo SOS</a><a href="#tecnologias">Tecnologias</a><a href="#como-funciona">Como funciona</a><a href="#painel">Painel</a><a class="btn sm" href="#contato">Contato</a>
+    <a href="#proposito">Propósito</a><a href="#funcionalidades">Recursos</a><a href="#demo">Demo SOS</a><a href="#tecnologias">Tecnologias</a><a href="#como-funciona">Como funciona</a><a href="#painel">Painel</a><a href="#privacidade">Privacidade</a><a class="btn sm" href="#contato">Contato</a>
   </nav>
 </div></header>
 
-<main>
+<main id="main">
 <section class="hero dark" id="inicio"><div class="wrap hero-grid">
   <div>
     <h1>Pedir ajuda não deveria ser perigoso.</h1>
@@ -56,7 +64,6 @@
     <h2>Tecnologia a serviço de quem mais precisa de proteção</h2>
     <p>Quando quem ameaça está por perto, até pedir ajuda é arriscado. O Alerta Rosa nasce para reduzir esse risco: um caminho rápido, discreto e confiável entre quem está em perigo e quem pode ajudar.</p>
     <p>Mais do que um botão, é um projeto que será construído em diálogo com especialistas, organizações e serviços oficiais da rede de proteção.</p>
-    <!-- EDITE: conte aqui a história real da equipe e a motivação do projeto. -->
   </div>
   <ul class="vals">
     <li><b>Acolhimento.</b> Linguagem simples e sem julgamento.</li>
@@ -69,15 +76,15 @@
   <h2>O que o Alerta Rosa vai oferecer</h2>
   <p class="lead">Cada recurso mostra a etapa planejada: nada abaixo está pronto para uso ainda.</p>
   <ul class="feat">
-    <li><svg class="i"><use href="#i-shield"/></svg><h3>Botão SOS</h3><span class="tag t-mvp">MVP</span><p>Segure por 2 segundos para acionar. Evita toques acidentais e avisa a rede de apoio.</p></li>
-    <li><svg class="i"><use href="#i-mic"/></svg><h3>Acionamento por voz</h3><span class="tag t-f2">Fase 2</span><p>Palavra-código reconhecida no próprio aparelho, sem enviar áudio para a nuvem.</p></li>
-    <li><svg class="i"><use href="#i-pin"/></svg><h3>Localização em tempo real</h3><span class="tag t-mvp">MVP</span><p>Compartilhada só durante o alerta ou o trajeto, e encerrada por você.</p></li>
-    <li><svg class="i"><use href="#i-users"/></svg><h3>Rede de Guardiãs</h3><span class="tag t-mvp">MVP</span><p>Pessoas de confiança que você escolhe e que recebem o alerta com a sua localização.</p></li>
-    <li><svg class="i"><use href="#i-lock"/></svg><h3>Cofre de evidências</h3><span class="tag t-mvp">MVP</span><p>Fotos, áudios e anotações cifrados, com impressão digital (hash) e data para checar a integridade.</p></li>
-    <li><svg class="i"><use href="#i-eye"/></svg><h3>Interface discreta</h3><span class="tag t-mvp">MVP</span><p>Ícone e nome neutros e PIN de coação, que abre uma tela falsa e envia um alerta silencioso.</p></li>
-    <li><svg class="i"><use href="#i-cpu"/></svg><h3>IA de apoio</h3><span class="tag t-f2">Fase 2</span><p>Sugere atenção a padrões de risco, no aparelho. Não decide por você nem aciona ninguém sozinha.</p></li>
-    <li><svg class="i"><use href="#i-book"/></svg><h3>Biblioteca de direitos</h3><span class="tag t-mvp">MVP</span><p>Informação clara sobre tipos de violência, Lei Maria da Penha e onde buscar ajuda.</p></li>
-    <li><svg class="i"><use href="#i-heart"/></svg><h3>Crianças e adolescentes</h3><span class="tag t-f2">Fase 2</span><p>Canal adaptado, com adulto de confiança e orientação ao Disque 100. Exige validação com especialistas.</p></li>
+    <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-shield"/></svg><h3>Botão SOS</h3><span class="tag t-mvp">MVP</span><p>Segure por 2 segundos para acionar. Evita toques acidentais e avisa a rede de apoio.</p></li>
+    <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-mic"/></svg><h3>Acionamento por voz</h3><span class="tag t-f2">Fase 2</span><p>Palavra-código reconhecida no próprio aparelho, sem enviar áudio para a nuvem.</p></li>
+    <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-pin"/></svg><h3>Localização em tempo real</h3><span class="tag t-mvp">MVP</span><p>Compartilhada só durante o alerta ou o trajeto, e encerrada por você.</p></li>
+    <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-users"/></svg><h3>Rede de Guardiãs</h3><span class="tag t-mvp">MVP</span><p>Pessoas de confiança que você escolhe e que recebem o alerta com a sua localização.</p></li>
+    <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-lock"/></svg><h3>Cofre de evidências</h3><span class="tag t-mvp">MVP</span><p>Fotos, áudios e anotações cifrados, com impressão digital (hash) e data para checar a integridade.</p></li>
+    <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-eye"/></svg><h3>Interface discreta</h3><span class="tag t-mvp">MVP</span><p>Ícone e nome neutros e PIN de coação, que abre uma tela falsa e envia um alerta silencioso.</p></li>
+    <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-cpu"/></svg><h3>IA de apoio</h3><span class="tag t-f2">Fase 2</span><p>Sugere atenção a padrões de risco, no aparelho. Não decide por você nem aciona ninguém sozinha.</p></li>
+    <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-book"/></svg><h3>Biblioteca de direitos</h3><span class="tag t-mvp">MVP</span><p>Informação clara sobre tipos de violência, Lei Maria da Penha e onde buscar ajuda.</p></li>
+    <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-heart"/></svg><h3>Crianças e adolescentes</h3><span class="tag t-f2">Fase 2</span><p>Canal adaptado, com adulto de confiança e orientação ao Disque 100. Exige validação com especialistas.</p></li>
   </ul>
 </div></section>
 
@@ -86,17 +93,19 @@
     <h2>Teste o botão SOS</h2>
     <p>Mantenha o botão pressionado por 2 segundos (toque, mouse ou tecla Espaço/Enter). Veja o que o aplicativo real fará.</p>
     <p class="warn" role="note"><strong>Simulação:</strong> nenhum alerta, localização ou gravação é enviado ou feito.</p>
+    <noscript><p class="warn">A demonstração precisa de JavaScript. Ative-o no navegador para testar.</p></noscript>
     <ol class="steps" id="demoSteps">
       <li>Avisaria suas Guardiãs com alerta prioritário</li>
       <li>Compartilharia sua localização enquanto o alerta durar</li>
       <li>Iniciaria uma gravação cifrada, guardada no aparelho</li>
       <li>Mostraria como ligar para 190, 180 ou 100</li>
     </ol>
+    <p id="demoCall" class="demo-call" hidden>Em perigo de verdade? Ligue <a href="tel:190">190</a>, <a href="tel:180">180</a> ou <a href="tel:100">100</a>.</p>
     <button id="demoReset" class="btn ghost" type="button" hidden>Cancelar simulação</button>
   </div>
   <div class="sos-wrap">
     <button id="sos" class="sos" type="button" aria-describedby="sosHint"><span id="sosLabel">SOS</span></button>
-    <p id="sosHint" style="margin:28px auto 0">Segure por 2 segundos</p>
+    <p id="sosHint" class="sos-hint">Segure por 2 segundos</p>
     <p id="sosLive" class="sr" aria-live="polite"></p>
   </div>
 </div></section>
@@ -105,12 +114,12 @@
   <h2>Tecnologias, com os limites ditos em voz alta</h2>
   <p class="lead">Cada tecnologia entra onde traz ganho real de proteção, e não por moda.</p>
   <div class="tech">
-    <div class="row"><h3><svg class="i"><use href="#i-lock"/></svg>Criptografia ponta a ponta</h3><p>Evidências e mensagens só abertas por quem tem a chave.</p><p class="lim">Limite: perder a chave pode significar perder o acesso. A recuperação precisa ser desenhada com cuidado.</p><span class="tag t-mvp">MVP</span></div>
-    <div class="row"><h3><svg class="i"><use href="#i-cloud"/></svg>Cloud</h3><p>Backup, sincronização e API, guardando apenas dados cifrados.</p><p class="lim">Limite: exige região e contratos adequados à LGPD e plano de resposta a incidentes.</p><span class="tag t-mvp">MVP</span></div>
-    <div class="row"><h3><svg class="i"><use href="#i-cpu"/></svg>Edge AI</h3><p>Modelos rodando no aparelho (ex.: TensorFlow Lite, Core ML) para voz e padrões de risco.</p><p class="lim">Limite: há falsos positivos e negativos. A IA sugere e a pessoa decide.</p><span class="tag t-f2">Fase 2</span></div>
-    <div class="row"><h3><svg class="i"><use href="#i-link"/></svg>Blockchain</h3><p>Ancora só o hash e a data de uma evidência, para provar que ela não foi alterada.</p><p class="lim">Limite: o conteúdo não vai para a rede. A validade jurídica depende da cadeia de custódia.</p><span class="tag t-f2">Fase 2</span></div>
-    <div class="row"><h3><svg class="i"><use href="#i-radio"/></svg>Mesh P2P (Bluetooth e Wi-Fi Direct)</h3><p>Alerta sem internet, repassado entre aparelhos próximos.</p><p class="lim">Limite: depende de outras pessoas com o app por perto e de restrições do iOS e do Android.</p><span class="tag t-p">Pesquisa</span></div>
-    <div class="row"><h3><svg class="i"><use href="#i-eye"/></svg>Provas de conhecimento zero (ZKP)</h3><p>Comprovar algo, como ser uma Guardiã verificada, sem revelar dados pessoais.</p><p class="lim">Limite: técnica complexa. Será usada só onde houver ganho claro de privacidade.</p><span class="tag t-p">Pesquisa</span></div>
+    <div class="row"><h3><svg class="i" aria-hidden="true" focusable="false"><use href="#i-lock"/></svg>Criptografia ponta a ponta</h3><p>Evidências e mensagens só abertas por quem tem a chave.</p><p class="lim">Limite: perder a chave pode significar perder o acesso. A recuperação precisa ser desenhada com cuidado.</p><span class="tag t-mvp">MVP</span></div>
+    <div class="row"><h3><svg class="i" aria-hidden="true" focusable="false"><use href="#i-cloud"/></svg>Cloud</h3><p>Backup, sincronização e API, guardando apenas dados cifrados.</p><p class="lim">Limite: exige região e contratos adequados à LGPD e plano de resposta a incidentes.</p><span class="tag t-mvp">MVP</span></div>
+    <div class="row"><h3><svg class="i" aria-hidden="true" focusable="false"><use href="#i-cpu"/></svg>Edge AI</h3><p>Modelos rodando no aparelho (ex.: LiteRT, antigo TensorFlow Lite, e Core ML) para voz e padrões de risco.</p><p class="lim">Limite: há falsos positivos e negativos. A IA sugere e a pessoa decide.</p><span class="tag t-f2">Fase 2</span></div>
+    <div class="row"><h3><svg class="i" aria-hidden="true" focusable="false"><use href="#i-link"/></svg>Blockchain</h3><p>Ancora só o hash e a data de uma evidência, para provar que ela não foi alterada.</p><p class="lim">Limite: o conteúdo não vai para a rede. A validade jurídica depende da cadeia de custódia.</p><span class="tag t-f2">Fase 2</span></div>
+    <div class="row"><h3><svg class="i" aria-hidden="true" focusable="false"><use href="#i-radio"/></svg>Mesh P2P (Bluetooth e Wi-Fi Direct)</h3><p>Alerta sem internet, repassado entre aparelhos próximos.</p><p class="lim">Limite: depende de outras pessoas com o app por perto e de restrições do iOS e do Android.</p><span class="tag t-p">Pesquisa</span></div>
+    <div class="row"><h3><svg class="i" aria-hidden="true" focusable="false"><use href="#i-eye"/></svg>Provas de conhecimento zero (ZKP)</h3><p>Comprovar algo, como ser uma Guardiã verificada, sem revelar dados pessoais.</p><p class="lim">Limite: técnica complexa. Será usada só onde houver ganho claro de privacidade.</p><span class="tag t-p">Pesquisa</span></div>
   </div>
 </div></section>
 
@@ -158,28 +167,48 @@
   </div>
 </div></section>
 
-<section id="contato" class="petal"><div class="wrap split">
-  <div>
+<section id="contato" class="contato-novo"><div class="wrap">
+  <div class="contato-header">
+    <span class="contato-tag">CONTATO</span>
     <h2>Equipe e contato</h2>
     <p>Quer apoiar, validar ou participar do projeto? Fale com a gente.</p>
-    <!-- EDITE: substitua pelos nomes e funções reais da equipe. -->
-    <div class="team">
-      <div class="person"><span class="av">?</span><p><strong>Nome Sobrenome</strong></p><p>Coordenação</p></div>
-      <div class="person"><span class="av">?</span><p><strong>Nome Sobrenome</strong></p><p>Tecnologia</p></div>
-      <div class="person"><span class="av">?</span><p><strong>Nome Sobrenome</strong></p><p>Jurídico e LGPD</p></div>
+  </div>
+  <div class="contato-layout">
+    <div>
+      <h3 class="contato-subtitulo">Quem está por trás</h3>
+      <div class="team-nova">
+        <div class="person-nova">
+          <span class="foto-fallback" aria-hidden="true">?</span>
+          <div class="person-info"><strong>Nome Sobrenome</strong><span>Coordenação</span></div>
+        </div>
+        <div class="person-nova">
+          <span class="foto-fallback" aria-hidden="true">?</span>
+          <div class="person-info"><strong>Nome Sobrenome</strong><span>Tecnologia</span></div>
+        </div>
+        <div class="person-nova">
+          <span class="foto-fallback" aria-hidden="true">?</span>
+          <div class="person-info"><strong>Nome Sobrenome</strong><span>Jurídico e LGPD</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="form-card">
+      <div class="form-header"><h3>Envie uma mensagem</h3></div>
+      <form id="contactForm">
+        <div class="campo-contato"><label for="nome">Nome</label>
+          <input id="nome" name="nome" autocomplete="name" required></div>
+        <div class="campo-contato"><label for="email">E-mail</label>
+          <input id="email" name="email" type="email" autocomplete="email" required></div>
+        <div class="campo-contato"><label for="msg">Mensagem</label>
+          <textarea id="msg" name="msg" rows="5" maxlength="1500" required></textarea></div>
+        <button class="btn btn-contato" type="submit">Abrir no meu e-mail</button>
+        <p class="form-aviso">O formulário apenas abre o seu aplicativo de e-mail. Este site não coleta dados.</p>
+      </form>
     </div>
   </div>
-  <form id="contactForm">
-    <div><label for="nome">Nome</label><input id="nome" name="nome" autocomplete="name" required></div>
-    <div><label for="email">E-mail</label><input id="email" name="email" type="email" autocomplete="email" required></div>
-    <div><label for="msg">Mensagem</label><textarea id="msg" name="msg" required></textarea></div>
-    <button class="btn" type="submit">Abrir no meu e-mail</button>
-    <p style="font-size:.85rem;margin:0">O formulário apenas abre o seu aplicativo de e-mail. Este site não coleta dados.</p>
-  </form>
 </div></section>
 </main>
 
-<footer><div class="wrap"><p>© 2026 Alerta Rosa, projeto em desenvolvimento. Não substitui os serviços oficiais de emergência: 190, 180 e 100.</p></div></footer>
-<script src="js/app.js"></script>
+<footer><div class="wrap"><p>© 2026 Alerta Rosa, projeto em desenvolvimento. Não substitui os serviços oficiais de emergência: <a href="tel:190">190</a>, <a href="tel:180">180</a> e <a href="tel:100">100</a>. <a href="#privacidade">Privacidade e LGPD</a></p></div></footer>
+<script src="js/app.js" defer></script>
 </body>
 </html>
