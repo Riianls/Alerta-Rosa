@@ -7,7 +7,7 @@
   "use strict";
 
   // IMPORTANTE: substitua pelo e-mail verdadeiro.
-  const CONTACT_EMAIL = "contato@seudominio.com.br";
+  const CONTACT_EMAIL = "alertaroosa@gmail.com";
 
   const HOLD_MS = 2000;
 
