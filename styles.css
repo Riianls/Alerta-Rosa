@@ -240,6 +240,8 @@ footer :focus-visible {
 #menu a:not(.btn) {
   color: #eee;
   font-size: .95rem;
+  padding: 8px 4px;
+
 }
 
 #menu a:not(.btn):hover { color: var(--pink); }
