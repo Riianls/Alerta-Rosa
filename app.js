@@ -259,46 +259,40 @@
 
   const contactForm = $("#contactForm");
 
-  if (contactForm) {
-
-    contactForm.addEventListener("submit", (event) => {
+    if (contactForm) {
+    contactForm.addEventListener("submit", async (event) => {
       event.preventDefault();
 
-      if (!contactForm.reportValidity()) {
-        return;
+      if (!contactForm.reportValidity()) return;
+
+      const status = $("#formStatus");
+      const button = contactForm.querySelector('button[type="submit"]');
+
+      button.disabled = true;
+      status.textContent = "Enviando...";
+
+      try {
+        const res = await fetch("https://api.web3forms.com/submit", {
+          method: "POST",
+          headers: { Accept: "application/json" },
+          body: new FormData(contactForm)
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          contactForm.reset();
+          status.textContent = "Mensagem enviada! Obrigado pelo contato.";
+        } else {
+          throw new Error(data.message || "erro");
+        }
+      } catch (erro) {
+        status.textContent =
+          "Não foi possível enviar agora. Tente de novo ou escreva para " +
+          CONTACT_EMAIL + ".";
+      } finally {
+        button.disabled = false;
       }
-
-      const formData = new FormData(contactForm);
-
-      const nome = String(
-        formData.get("nome") || ""
-      ).trim();
-
-      const email = String(
-        formData.get("email") || ""
-      ).trim();
-
-      const mensagem = String(
-        formData.get("msg") || ""
-      ).trim();
-
-      const body =
-        `Nome: ${nome}\n` +
-        `E-mail: ${email}\n\n` +
-        `Mensagem:\n${mensagem}`;
-
-      const subject = encodeURIComponent(
-        "Contato — Alerta Rosa"
-      );
-
-      const encodedBody = encodeURIComponent(body);
-
-      const mailto =
-        `mailto:${CONTACT_EMAIL}` +
-        `?subject=${subject}` +
-        `&body=${encodedBody}`;
-
-      window.location.href = mailto;
     });
   }
 
