@@ -228,7 +228,13 @@ footer :focus-visible {
   display: block;
   width: 46px;
   height: 46px;
-   
+}
+
+#menu {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  list-style: none;
 }
 
 #menu a:not(.btn) {
