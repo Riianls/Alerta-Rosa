@@ -103,6 +103,8 @@
   const reset = $("#demoReset");
   const callBox = $("#demoCall");
   const steps = $$("#demoSteps li");
+  const sosStage = $("#sosStage");
+  const ringProgress = $("#sosRingProgress");
 
   if (sos && label && live && reset) {
 
@@ -110,9 +112,17 @@
     let raf = 0;
     let active = false;
     let timers = [];
+    const RING_CIRCUMFERENCE = 741.42;
 
     const setP = (percentage) => {
       sos.style.setProperty("--p", percentage);
+      if (sosStage) {
+        sosStage.style.setProperty("--p", percentage);
+      }
+      if (ringProgress) {
+        const offset = RING_CIRCUMFERENCE * (1 - percentage / 100);
+        ringProgress.style.strokeDashoffset = offset;
+      }
     };
 
     const say = (message) => {
@@ -123,7 +133,12 @@
       active = true;
       t0 = 0;
 
+      sos.classList.remove("holding");
       sos.classList.add("on");
+      if (sosStage) {
+        sosStage.classList.remove("holding");
+        sosStage.classList.add("active");
+      }
 
       label.innerHTML = "Simulado<small>demonstração</small>";
 
@@ -169,6 +184,9 @@
     const press = () => {
       if (active || t0) return;
 
+      sos.classList.add("holding");
+      if (sosStage) sosStage.classList.add("holding");
+
       t0 = performance.now();
 
       raf = requestAnimationFrame(tick);
@@ -176,6 +194,9 @@
 
     const release = () => {
       if (active || !t0) return;
+
+      sos.classList.remove("holding");
+      if (sosStage) sosStage.classList.remove("holding");
 
       cancelAnimationFrame(raf);
 
@@ -193,6 +214,12 @@
       t0 = 0;
 
       cancelAnimationFrame(raf);
+
+      sos.classList.remove("holding");
+      if (sosStage) {
+        sosStage.classList.remove("holding");
+        sosStage.classList.remove("active");
+      }
 
       steps.forEach((li) => {
         li.classList.remove("done");
@@ -250,6 +277,53 @@
     });
 
     reset.addEventListener("click", cancel);
+
+    // Efeito Magnetic / Cursor Tilt em 3D (ativo apenas em desktop com mouse)
+    if (sosStage && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+      let tiltRaf = 0;
+      let targetRotX = 0;
+      let targetRotY = 0;
+      let currentRotX = 0;
+      let currentRotY = 0;
+
+      const renderTilt = () => {
+        currentRotX += (targetRotX - currentRotX) * 0.14;
+        currentRotY += (targetRotY - currentRotY) * 0.14;
+
+        sos.style.setProperty("--tilt-x", `${currentRotX.toFixed(2)}deg`);
+        sos.style.setProperty("--tilt-y", `${currentRotY.toFixed(2)}deg`);
+
+        if (Math.abs(targetRotX - currentRotX) > 0.02 || Math.abs(targetRotY - currentRotY) > 0.02) {
+          tiltRaf = requestAnimationFrame(renderTilt);
+        } else {
+          tiltRaf = 0;
+        }
+      };
+
+      sosStage.addEventListener("mousemove", (event) => {
+        const rect = sosStage.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const maxAngle = 15; // até 15 graus
+        targetRotY = Math.max(-maxAngle, Math.min(maxAngle, ((x - centerX) / centerX) * maxAngle));
+        targetRotX = Math.max(-maxAngle, Math.min(maxAngle, -((y - centerY) / centerY) * maxAngle));
+
+        if (!tiltRaf) {
+          tiltRaf = requestAnimationFrame(renderTilt);
+        }
+      });
+
+      sosStage.addEventListener("mouseleave", () => {
+        targetRotX = 0;
+        targetRotY = 0;
+        if (!tiltRaf) {
+          tiltRaf = requestAnimationFrame(renderTilt);
+        }
+      });
+    }
   }
 
   /* ======================================

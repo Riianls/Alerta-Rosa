@@ -99,7 +99,7 @@
 </div></section>
 
 <section id="demo" class="pink"><div class="wrap demo">
-  <div>
+  <div class="demo-content">
     <h2>Teste o botão SOS</h2>
     <p>Mantenha o botão pressionado por 2 segundos (toque, mouse ou tecla Espaço/Enter). Veja o que o aplicativo real fará.</p>
     <p class="warn" role="note"><strong>Simulação:</strong> nenhum alerta, localização ou gravação é enviado ou feito.</p>
@@ -113,8 +113,46 @@
     <p id="demoCall" class="demo-call" hidden>Em perigo de verdade? Ligue <a href="tel:190">190</a>, <a href="tel:180">180</a> ou <a href="tel:100">100</a>.</p>
     <button id="demoReset" class="btn ghost" type="button" hidden>Cancelar simulação</button>
   </div>
-  <div class="sos-wrap">
-    <button id="sos" class="sos" type="button" aria-describedby="sosHint"><span id="sosLabel">SOS</span></button>
+  <div class="sos-wrap" id="sosWrap">
+    <div class="sos-stage" id="sosStage">
+      <!-- Ondas de choque / radar 3D -->
+      <div class="sos-radar" id="sosRadar" aria-hidden="true">
+        <span class="sos-wave wave-1"></span>
+        <span class="sos-wave wave-2"></span>
+        <span class="sos-wave wave-3"></span>
+      </div>
+
+      <!-- Anel luminoso SVG com progresso de 2s -->
+      <svg class="sos-ring-svg" viewBox="0 0 260 260" aria-hidden="true">
+        <defs>
+          <linearGradient id="sosRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ff3d8b" />
+            <stop offset="60%" stop-color="#ff7da9" />
+            <stop offset="100%" stop-color="#ffffff" />
+          </linearGradient>
+          <filter id="sosNeonGlow" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="4" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+        <circle class="sos-ring-track" cx="130" cy="130" r="118" />
+        <circle class="sos-ring-progress" id="sosRingProgress" cx="130" cy="130" r="118" />
+      </svg>
+
+      <!-- Bezel cilíndrico de base metálica chanfrada -->
+      <div class="sos-bezel" aria-hidden="true"></div>
+
+      <!-- Botão SOS 3D físico -->
+      <button id="sos" class="sos" type="button" aria-describedby="sosHint">
+        <span class="sos-surface">
+          <span class="sos-gloss" aria-hidden="true"></span>
+          <span id="sosLabel">SOS</span>
+        </span>
+      </button>
+    </div>
     <p id="sosHint" class="sos-hint">Segure por 2 segundos</p>
     <p id="sosLive" class="sr" aria-live="polite"></p>
   </div>
