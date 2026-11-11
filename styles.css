@@ -387,21 +387,10 @@ footer :focus-visible {
 #demo {
   position: relative;
   overflow: hidden;
-  background: radial-gradient(circle at 75% 50%, rgba(20, 2, 10, 0.4) 0%, rgba(0, 0, 0, 0.48) 100%), var(--pink);
-}
-
-#demo::before {
-  content: "";
-  position: absolute;
-  top: -20%;
-  right: 10%;
-  width: 500px;
-  height: 500px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 61, 139, 0.28) 0%, transparent 70%);
-  filter: blur(50px);
-  pointer-events: none;
-  z-index: 0;
+  background:
+    radial-gradient(circle at 75% 50%, rgba(255, 61, 139, 0.22) 0%, transparent 60%),
+    radial-gradient(circle at 70% 50%, rgba(15, 2, 8, 0.45) 0%, rgba(0, 0, 0, 0.52) 100%),
+    var(--pink);
 }
 
 #demo .wrap.demo {
