@@ -1,9 +1,9 @@
 /* =========================================================
-   ROTAS SEGURAS — MapLibre + satélite + dados reais do OpenStreetMap
-   - Imagem de satélite (Esri World Imagery) com ruas e nomes por cima
-   - Delegacias, Delegacias da Mulher e hospitais reais:
-       1) dados-rotas.json  → Grande São Paulo (carrega na hora)
-       2) Photon (OSM)      → busca ao vivo em outras cidades
+   ROTAS SEGURAS — Município de Maricá (RJ)
+   - O mapa só funciona dentro do limite oficial de Maricá
+     (fora dele fica coberto e não aceita cliques, buscas ou rotas)
+   - dados-marica.json: limite do município + rede de proteção à mulher,
+     delegacias, hospitais/UPAs, unidades de saúde e assistência social
    - Rotas a pé reais até o ponto seguro mais próximo (OSRM)
    ========================================================= */
 (() => {
@@ -12,30 +12,55 @@
   if (!mapEl) return;
   const statusEl = $('#rotasStatus');
   const resultsEl = $('#rotasResults');
-  const L = window.lucide;
-
-  const drawIcons = () => { try { L && L.createIcons(); } catch (e) {} };
-  const icon = (name) => {
-    try { if (L && L.icons && L.icons[name]) return L.createElement(L.icons[name]); } catch (e) {}
-    const s = document.createElement('b'); s.textContent = '•'; return s;
-  };
   const setStatus = (t, busy) => { statusEl.textContent = t; statusEl.classList.toggle('is-busy', !!busy); };
-  drawIcons();
 
-  if (!window.maplibregl) { setStatus('Não foi possível carregar o mapa. Verifique sua conexão.'); return; }
+  /* ícones (Lucide, ISC) — só os usados, sem carregar a biblioteca inteira */
+  const ICONS = {
+    ShieldAlert: '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M12 8v4"/><path d="M12 16h.01"/>',
+    ShieldCheck: '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
+    Hospital: '<path d="M12 6v4"/><path d="M14 14h-4"/><path d="M14 18h-4"/><path d="M14 8h-4"/><path d="M18 12h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2h2"/><path d="M18 22V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v18"/>',
+    Stethoscope: '<path d="M11 2v2"/><path d="M5 2v2"/><path d="M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1"/><path d="M8 15a6 6 0 0 0 12 0v-3"/><circle cx="20" cy="10" r="2"/>',
+    HeartHandshake: '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"/><path d="m18 15-2-2"/><path d="m15 18-2-2"/>',
+    Route: '<circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/>',
+    Navigation: '<polygon points="3 11 22 2 13 21 11 13 3 11"/>',
+  };
+  const icon = (name) => {
+    const t = document.createElement('template');
+    t.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[name] || ''}</svg>`;
+    return t.content.firstChild;
+  };
 
-  /* fetch que nunca fica preso: desiste depois de ms */
+  /* MapLibre (~800 KB) só é baixado quando a seção do mapa se aproxima */
+  const ML = 'https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl';
+  new IntersectionObserver((es, io) => {
+    if (!es[0].isIntersecting) return;
+    io.disconnect();
+    const load = (el) => new Promise((ok, fail) => { el.onload = ok; el.onerror = fail; document.head.append(el); });
+    const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = ML + '.css';
+    const js = document.createElement('script'); js.src = ML + '.js';
+    // o mapa só é criado depois do CSS e do JS (sem o CSS o canvas nasce com tamanho errado)
+    Promise.all([load(css), load(js)]).then(init, () => setStatus('Não foi possível carregar o mapa. Verifique sua conexão.'));
+  }, { rootMargin: '120% 0px' }).observe(mapEl);
+
+  function init() {
+
   const fetchT = (url, opts = {}, ms = 10000) => {
     const c = new AbortController(), t = setTimeout(() => c.abort(), ms);
     return fetch(url, { ...opts, signal: c.signal }).finally(() => clearTimeout(t));
   };
 
   const KINDS = {
-    ddm:      { label: 'Delegacia da Mulher', icon: 'ShieldAlert', color: '#e3336d' },
-    police:   { label: 'Delegacia / Polícia', icon: 'ShieldCheck', color: '#5b3fd6' },
-    hospital: { label: 'Hospital',            icon: 'Hospital',    color: '#0f9d77' },
+    mulher:   { label: 'Atendimento à Mulher', icon: 'ShieldAlert', color: '#e3336d' },
+    police:   { label: 'Delegacia / Polícia',  icon: 'ShieldCheck', color: '#5b3fd6' },
+    hospital: { label: 'Hospital / UPA',       icon: 'Hospital',    color: '#0f9d77' },
+    saude:    { label: 'Unidade de Saúde',     icon: 'Stethoscope', color: '#1d8fd1' },
+    apoio:    { label: 'Assistência & Apoio',  icon: 'HeartHandshake', color: '#d98a00' },
   };
-  const START = [-46.6339, -23.5505]; // Praça da Sé, São Paulo
+
+  /* limites de Maricá (substituídos pelos dados oficiais ao carregar) */
+  let BBOX = [-43.0251, -23.0253, -42.6342, -22.8408]; // [w, s, e, n]
+  const START = [-42.8186, -22.9194];                  // Centro de Maricá
+  const pad = (b, k) => [[b[0] - k, b[1] - k], [b[2] + k, b[3] + k]];
   const coarse = window.matchMedia && matchMedia('(pointer: coarse)').matches;
 
   /* ---------- estilo satélite ---------- */
@@ -44,14 +69,12 @@
     version: 8,
     sources: {
       sat:    { type: 'raster', tiles: esri('World_Imagery'), tileSize: 256, maxzoom: 19,
-                attribution: 'Imagens © Esri, Maxar, Earthstar Geographics · Dados © colaboradores do OpenStreetMap' },
-      street: { type: 'raster', tiles: esri('World_Street_Map'), tileSize: 256, maxzoom: 19 },
+                attribution: 'Imagens © Esri, Maxar, Earthstar Geographics · Dados © colaboradores do OpenStreetMap · Prefeitura de Maricá' },
       roads:  { type: 'raster', tiles: esri('Reference/World_Transportation'), tileSize: 256, maxzoom: 19 },
       labels: { type: 'raster', tiles: esri('Reference/World_Boundaries_and_Places'), tileSize: 256, maxzoom: 19 },
     },
     layers: [
       { id: 'sat', type: 'raster', source: 'sat' },
-      { id: 'street', type: 'raster', source: 'street', layout: { visibility: 'none' } },
       { id: 'roads', type: 'raster', source: 'roads', paint: { 'raster-opacity': 0.9 } },
       { id: 'labels', type: 'raster', source: 'labels' },
     ],
@@ -59,43 +82,39 @@
 
   const map = new maplibregl.Map({
     container: mapEl, style: STYLE,
-    center: START, zoom: 14, minZoom: 3, maxZoom: 19,
-    cooperativeGestures: coarse, // no celular: dois dedos movem o mapa, um dedo rola a página
-    attributionControl: { compact: true },
+    center: START, zoom: 12.4, minZoom: 10, maxZoom: 19,
+    maxBounds: pad(BBOX, 0.06),
+    cooperativeGestures: coarse,
+    attributionControl: false,
   });
+  map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right');
+  // créditos (exigidos pelas licenças) ficam recolhidos no botão ⓘ
+  map.once('load', () => mapEl.querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show'));
   map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
   const geo = new maplibregl.GeolocateControl({
     positionOptions: { enableHighAccuracy: true }, showUserLocation: false, showAccuracyCircle: false,
-    fitBoundsOptions: { maxZoom: 15 },
+    fitBoundsOptions: { maxZoom: 15 }, trackUserLocation: false,
   });
   map.addControl(geo, 'top-right');
   map.addControl(new maplibregl.FullscreenControl({ container: mapEl.parentElement }), 'top-right');
   map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
 
-  /* botão Satélite / Mapa */
-  class LayerSwitch {
-    onAdd(m) {
-      this.el = document.createElement('div');
-      this.el.className = 'maplibregl-ctrl maplibregl-ctrl-group rswitch';
-      const mk = (id, label) => {
-        const b = document.createElement('button'); b.type = 'button'; b.textContent = label; b.dataset.v = id;
-        b.addEventListener('click', () => {
-          const sat = id === 'sat';
-          m.setLayoutProperty('sat', 'visibility', sat ? 'visible' : 'none');
-          m.setLayoutProperty('roads', 'visibility', sat ? 'visible' : 'none');
-          m.setLayoutProperty('labels', 'visibility', sat ? 'visible' : 'none');
-          m.setLayoutProperty('street', 'visibility', sat ? 'none' : 'visible');
-          this.el.querySelectorAll('button').forEach((x) => x.classList.toggle('is-on', x === b));
-        });
-        return b;
-      };
-      const a = mk('sat', 'Satélite'); a.classList.add('is-on');
-      this.el.append(a, mk('street', 'Mapa'));
-      return this.el;
+  /* ---------- limite do município ---------- */
+  let BOUNDARY = null; // MultiPolygon
+  const inRing = (pt, ring) => {
+    let inside = false;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      const [xi, yi] = ring[i], [xj, yj] = ring[j];
+      if ((yi > pt[1]) !== (yj > pt[1]) && pt[0] < ((xj - xi) * (pt[1] - yi)) / (yj - yi) + xi) inside = !inside;
     }
-    onRemove() { this.el.remove(); }
-  }
-  map.addControl(new LayerSwitch(), 'top-left');
+    return inside;
+  };
+  const inMarica = (pt) => {
+    if (pt[0] < BBOX[0] || pt[0] > BBOX[2] || pt[1] < BBOX[1] || pt[1] > BBOX[3]) return false;
+    if (!BOUNDARY) return true;
+    return BOUNDARY.coordinates.some((poly) => inRing(pt, poly[0]) && !poly.slice(1).some((h) => inRing(pt, h)));
+  };
+  const OUTSIDE = 'Fora de Maricá — o mapa atende apenas o município de Maricá (RJ).';
 
   /* ---------- ponto de partida ---------- */
   const originEl = document.createElement('div');
@@ -104,70 +123,73 @@
   originEl.append(icon('Navigation'));
   const origin = new maplibregl.Marker({ element: originEl, draggable: true }).setLngLat(START).addTo(map);
 
-  let routed = false, lastTargets = null;
-  const setOrigin = (ll) => { origin.setLngLat(ll); if (routed) traceRoutes(lastTargets); };
-  origin.on('dragend', () => { if (routed) traceRoutes(lastTargets); });
-  geo.on('geolocate', (p) => { lastTargets = null; origin.setLngLat([p.coords.longitude, p.coords.latitude]); traceRoutes(); });
+  /* o sino 3D (main.js) pergunta aqui onde pousar: no ponto de partida, se ele estiver visível no mapa */
+  window.alertaRosa = window.alertaRosa || {};
+  window.alertaRosa.dock = () => {
+    const fr = mapEl.getBoundingClientRect(), p = map.project(origin.getLngLat());
+    const x = fr.left + p.x, y = fr.top + p.y;
+    const visible = x > fr.left + 12 && x < fr.right - 12 && y > fr.top + 60 && y < fr.bottom - 12 && fr.bottom > 0 && fr.top < innerHeight;
+    return { x, y, visible };
+  };
+
+  let routed = false, lastTargets = null, lastGood = START;
+  const setOrigin = (ll) => {
+    if (!inMarica(ll)) { setStatus(OUTSIDE); return false; }
+    origin.setLngLat(ll); lastGood = ll;
+    if (routed) traceRoutes(lastTargets);
+    return true;
+  };
+  origin.on('dragend', () => {
+    const o = origin.getLngLat(), ll = [o.lng, o.lat];
+    if (!inMarica(ll)) { origin.setLngLat(lastGood); setStatus(OUTSIDE); return; }
+    lastGood = ll;
+    if (routed) traceRoutes(lastTargets);
+  });
+  geo.on('geolocate', (p) => {
+    const ll = [p.coords.longitude, p.coords.latitude];
+    if (!inMarica(ll)) {
+      setStatus('Sua localização está fora de Maricá. Clique no mapa para escolher um ponto dentro do município.');
+      map.fitBounds(pad(BBOX, 0), { padding: 30, duration: 900 });
+      return;
+    }
+    lastTargets = null; origin.setLngLat(ll); lastGood = ll; traceRoutes();
+  });
   map.on('click', (e) => {
     if (e.originalEvent.target.closest('.pin, .maplibregl-popup')) return;
     setOrigin([e.lngLat.lng, e.lngLat.lat]);
   });
 
-  /* ---------- dados reais ---------- */
-  const places = new Map();   // id -> {id, kind, name, ll, addr, area, phone}
-  const markers = new Map();  // id -> Marker
+  /* ---------- dados ---------- */
+  const places = new Map();
+  const markers = new Map();
   const hidden = new Set();
-  let localBox = null;        // área coberta pelo dados-rotas.json [w,s,e,n]
-  const liveDone = new Set(); // células já buscadas ao vivo
 
-  const kindOf = (osmValue, name) =>
-    osmValue === 'hospital' ? 'hospital' : /mulher|\bddm\b|\bdeam\b/i.test(name || '') ? 'ddm' : 'police';
-  const put = (p) => { if (!places.has(p.id)) places.set(p.id, p); };
-
-  const localReady = fetchT('dados-rotas.json', {}, 15000)
+  const ready = fetchT('dados-marica.json', {}, 15000)
     .then((r) => r.json())
     .then((d) => {
-      localBox = d.bbox;
-      d.places.forEach(([id, kind, name, lon, lat, addr, area]) =>
-        put({ id, kind, name: name || KINDS[kind].label, ll: [lon, lat], addr, area }));
+      BBOX = d.bbox;
+      BOUNDARY = d.boundary;
+      map.setMaxBounds(pad(BBOX, 0.06));
+      d.places.forEach(([id, kind, name, lon, lat, addr, area, phone, note]) => {
+        if (!KINDS[kind]) return;
+        places.set(id, { id, kind, name: name || KINDS[kind].label, ll: [lon, lat], addr, area, phone, note });
+      });
+      return d;
     })
-    .catch((e) => console.warn('dados-rotas.json indisponível', e));
+    .catch((e) => { console.warn('dados-marica.json indisponível', e); return null; });
 
-  const inLocal = (ll) => localBox && ll[0] >= localBox[0] && ll[0] <= localBox[2] && ll[1] >= localBox[1] && ll[1] <= localBox[3];
-
-  /* busca ao vivo (fora da Grande SP) — Photon / OpenStreetMap */
-  const LIVE_Q = [['amenity:police', 'delegacia'], ['amenity:police', 'policia'], ['amenity:police', 'mulher'], ['amenity:hospital', 'hospital']];
-  async function photonBox(w, s, e, n) {
-    const bbox = [w, s, e, n].map((v) => v.toFixed(4)).join(',');
-    await Promise.all(LIVE_Q.map(async ([tag, q]) => {
-      try {
-        const r = await fetchT(`https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&osm_tag=${tag}&bbox=${bbox}&limit=50`);
-        const j = await r.json();
-        j.features.forEach((f) => {
-          const p = f.properties;
-          if (p.osm_key !== 'amenity' || !['police', 'hospital'].includes(p.osm_value)) return;
-          const kind = kindOf(p.osm_value, p.name);
-          put({
-            id: p.osm_type.toLowerCase() + p.osm_id, kind, name: p.name || KINDS[kind].label,
-            ll: f.geometry.coordinates,
-            addr: [p.street, p.housenumber].filter(Boolean).join(', '), area: p.district || p.city || '',
-          });
-        });
-      } catch (err) { /* um termo falhou: segue com os outros */ }
-    }));
-  }
-  /* garante dados ao redor de um ponto (células de ~0,1°) */
-  async function ensureAround(ll, r = 1) {
-    const jobs = [];
-    const cx = Math.floor(ll[0] * 10), cy = Math.floor(ll[1] * 10);
-    for (let x = cx - r; x <= cx + r; x++) for (let y = cy - r; y <= cy + r; y++) {
-      const key = x + ':' + y, c = [(x + 0.5) / 10, (y + 0.5) / 10];
-      if (liveDone.has(key) || inLocal(c)) continue;
-      liveDone.add(key);
-      jobs.push(photonBox(x / 10, y / 10, (x + 1) / 10, (y + 1) / 10).catch(() => liveDone.delete(key)));
-    }
-    if (jobs.length) await Promise.all(jobs);
-    return jobs.length;
+  /* máscara: tudo fora de Maricá fica coberto */
+  function addBoundaryLayers() {
+    if (!BOUNDARY || map.getSource('marica')) return;
+    const world = [[-180, -85], [180, -85], [180, 85], [-180, 85], [-180, -85]];
+    const holes = BOUNDARY.coordinates.map((poly) => poly[0]);
+    map.addSource('marica-mask', { type: 'geojson', data: { type: 'Feature', geometry: { type: 'Polygon', coordinates: [world, ...holes] } } });
+    map.addSource('marica', { type: 'geojson', data: { type: 'Feature', geometry: BOUNDARY } });
+    map.addLayer({ id: 'marica-mask', type: 'fill', source: 'marica-mask', paint: { 'fill-color': '#1a0710', 'fill-opacity': 0.78 } }, 'routes-casing');
+    map.addLayer({ id: 'marica-line-glow', type: 'line', source: 'marica',
+      paint: { 'line-color': '#ff8fb1', 'line-width': 7, 'line-opacity': 0.35, 'line-blur': 3 } }, 'routes-casing');
+    map.addLayer({ id: 'marica-line', type: 'line', source: 'marica',
+      paint: { 'line-color': '#e3336d', 'line-width': 2.5, 'line-dasharray': [3, 1.5] } }, 'routes-casing');
   }
 
   /* ---------- marcadores ---------- */
@@ -178,6 +200,12 @@
     const h = document.createElement('strong'); h.textContent = p.name;
     d.append(tag, h);
     if (p.addr || p.area) { const a = document.createElement('p'); a.textContent = [p.addr, p.area].filter(Boolean).join(' — '); d.append(a); }
+    if (p.note) { const n = document.createElement('p'); n.className = 'rpop__note'; n.textContent = p.note; d.append(n); }
+    if (p.phone) {
+      const t = document.createElement('a'); t.className = 'rpop__tel';
+      t.href = 'tel:' + p.phone.split('·')[0].replace(/[^\d+]/g, '');
+      t.textContent = '☎ ' + p.phone; d.append(t);
+    }
     const maps = document.createElement('a');
     maps.className = 'rpop__link'; maps.target = '_blank'; maps.rel = 'noopener';
     maps.href = `https://www.google.com/maps/dir/?api=1&destination=${p.ll[1]},${p.ll[0]}&travelmode=walking`;
@@ -194,7 +222,7 @@
     el.type = 'button'; el.className = `pin pin--${p.kind}`;
     el.setAttribute('aria-label', `${KINDS[p.kind].label}: ${p.name}`);
     el.append(icon(KINDS[p.kind].icon));
-    const pop = new maplibregl.Popup({ offset: 18, maxWidth: '270px' });
+    const pop = new maplibregl.Popup({ offset: 18, maxWidth: '280px' });
     pop.setDOMContent(popupContent(p, pop));
     return new maplibregl.Marker({ element: el }).setLngLat(p.ll).setPopup(pop).addTo(map);
   }
@@ -202,7 +230,7 @@
     const b = map.getBounds(), keep = new Set();
     let n = 0;
     for (const p of places.values()) {
-      if (hidden.has(p.kind) || !b.contains(p.ll) || n >= 350) continue;
+      if (hidden.has(p.kind) || !b.contains(p.ll)) continue;
       n++; keep.add(p.id);
       if (!markers.has(p.id)) markers.set(p.id, makeMarker(p));
     }
@@ -211,25 +239,10 @@
   }
   const countStatus = () => {
     const n = render();
-    setStatus(n ? `${n} locais reais nesta área · OpenStreetMap` : 'Nenhuma delegacia ou hospital nesta área');
+    setStatus(n ? `${n} pontos seguros nesta área · Maricá (RJ)` : 'Nenhum ponto seguro visível — afaste o mapa');
   };
-
-  let viewId = 0;
-  async function loadView() {
-    const id = ++viewId;
-    await localReady;
-    if (id !== viewId) return;
-    if (map.getZoom() < 10) { render(); setStatus('Aproxime o mapa para ver delegacias e hospitais'); return; }
-    const c = map.getCenter();
-    if (!inLocal([c.lng, c.lat])) {
-      setStatus('Buscando delegacias e hospitais desta região…', true);
-      await ensureAround([c.lng, c.lat], map.getZoom() >= 12 ? 1 : 2);
-      if (id !== viewId) return;
-    }
-    countStatus();
-  }
   let deb;
-  map.on('moveend', () => { clearTimeout(deb); deb = setTimeout(loadView, 350); });
+  map.on('moveend', () => { clearTimeout(deb); deb = setTimeout(countStatus, 200); });
 
   /* ---------- rotas ---------- */
   const dist = (a, b) => {
@@ -241,7 +254,7 @@
   const nearest = (from, kinds) => {
     let best = null, bd = Infinity;
     for (const p of places.values()) {
-      if (!kinds.includes(p.kind)) continue;
+      if (!kinds.includes(p.kind) || hidden.has(p.kind)) continue;
       const d = dist(from, p.ll);
       if (d < bd) { bd = d; best = p; }
     }
@@ -267,18 +280,16 @@
     routed = true;
     const id = ++traceId;
     const o = origin.getLngLat(), from = [o.lng, o.lat];
-    setStatus('Procurando os pontos seguros mais próximos…', true);
     resultsEl.innerHTML = '';
+    if (!inMarica(from)) { setStatus(OUTSIDE); return; }
+    setStatus('Procurando os pontos seguros mais próximos…', true);
     if (!targets) {
-      await localReady;
-      if (!inLocal(from)) await ensureAround(from, 1);
+      await ready;
       if (id !== traceId) return;
-      const police = nearest(from, ['ddm', 'police']);
-      const ddm = nearest(from, ['ddm']);
-      const hosp = nearest(from, ['hospital']);
-      targets = [police, ddm && ddm !== police && dist(from, ddm.ll) < 15000 ? ddm : null, hosp].filter(Boolean);
+      targets = [nearest(from, ['mulher']), nearest(from, ['police']), nearest(from, ['hospital'])]
+        .filter((t, i, a) => t && a.indexOf(t) === i);
     }
-    if (!targets.length) { setStatus('Nenhum ponto seguro encontrado por perto.'); return; }
+    if (!targets.length) { setStatus('Nenhum ponto seguro encontrado — reative as categorias na legenda.'); return; }
     setStatus('Calculando rotas a pé…', true);
     const res = await Promise.all(targets.map(async (t) => ({ t, r: await route(from, t.ll) })));
     if (id !== traceId) return;
@@ -287,15 +298,15 @@
       type: 'Feature', properties: { kind: t.kind },
       geometry: r ? r.geometry : { type: 'LineString', coordinates: [from, t.ll] },
     }));
-    map.getSource('routes')?.setData({ type: 'FeatureCollection', features: feats });
+    map.getSource('routes')?.setData({ type: 'FeatureCollection', features: [] });
 
     const bounds = new maplibregl.LngLatBounds(from, from);
     feats.forEach((f) => f.geometry.coordinates.forEach((c) => bounds.extend(c)));
-    map.fitBounds(bounds, { padding: { top: 70, bottom: 50, left: 50, right: 70 }, maxZoom: 16, duration: 1400 });
+    map.fitBounds(bounds, { padding: { top: 90, bottom: 50, left: 50, right: 70 }, maxZoom: 16, duration: 1400 });
 
     res.forEach(({ t, r }) => {
       const m = r ? r.distance : dist(from, t.ll);
-      const min = Math.max(1, Math.round(m / 80)); // ~4,8 km/h a pé
+      const min = Math.max(1, Math.round(m / 80));
       const li = document.createElement('li');
       const b = document.createElement('button');
       b.type = 'button'; b.className = `rres rres--${t.kind}`;
@@ -313,9 +324,44 @@
       li.append(b); resultsEl.append(li);
     });
     setStatus('Rotas traçadas · arraste o ponto de partida para recalcular');
+
+    // espera o mapa enquadrar, o sino toca e solta um raio até cada destino; as rotas se desenham a partir dele
+    await new Promise((ok) => { const to = setTimeout(ok, 1700); map.once('moveend', () => { clearTimeout(to); ok(); }); });
+    if (id !== traceId) return;
+    const fr = mapEl.getBoundingClientRect();
+    const points = res.map(({ t }) => { const p = map.project(t.ll); return { x: fr.left + p.x, y: fr.top + p.y, color: KINDS[t.kind].color }; });
+    const docked = document.body.classList.contains('bell-docked');
+    window.dispatchEvent(new CustomEvent('alerta:rays', { detail: { points } }));
+    setTimeout(() => growRoutes(feats, id), docked ? 550 : 0);
   }
 
-  map.on('load', () => {
+  /* desenha as rotas progressivamente, do ponto de partida até cada destino */
+  function growRoutes(feats, id) {
+    const src = map.getSource('routes');
+    if (!src) return;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { src.setData({ type: 'FeatureCollection', features: feats }); return; }
+    const acc = feats.map((f) => {
+      const c = f.geometry.coordinates, a = [0];
+      for (let i = 1; i < c.length; i++) a.push(a[i - 1] + Math.hypot(c[i][0] - c[i - 1][0], c[i][1] - c[i - 1][1]));
+      return a;
+    });
+    const t0 = performance.now(), dur = 1300;
+    const step = (now) => {
+      if (id !== traceId) return;
+      const p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+      src.setData({ type: 'FeatureCollection', features: feats.map((f, j) => {
+        const c = f.geometry.coordinates, a = acc[j], L = a[a.length - 1] * e;
+        let k = 1; while (k < c.length && a[k] < L) k++;
+        const pts = c.slice(0, k);
+        if (k < c.length) { const A = c[k - 1], B = c[k], r = (L - a[k - 1]) / ((a[k] - a[k - 1]) || 1); pts.push([A[0] + (B[0] - A[0]) * r, A[1] + (B[1] - A[1]) * r]); }
+        return { ...f, geometry: { type: 'LineString', coordinates: pts.length > 1 ? pts : [c[0], c[0]] } };
+      }) });
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  map.on('load', async () => {
     map.addSource('routes', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
     map.addLayer({ id: 'routes-casing', type: 'line', source: 'routes',
       layout: { 'line-cap': 'round', 'line-join': 'round' },
@@ -323,32 +369,40 @@
     map.addLayer({ id: 'routes-line', type: 'line', source: 'routes',
       layout: { 'line-cap': 'round', 'line-join': 'round' },
       paint: {
-        'line-color': ['match', ['get', 'kind'], 'ddm', KINDS.ddm.color, 'hospital', KINDS.hospital.color, KINDS.police.color],
+        'line-color': ['match', ['get', 'kind'],
+          'mulher', KINDS.mulher.color, 'hospital', KINDS.hospital.color,
+          'saude', KINDS.saude.color, 'apoio', KINDS.apoio.color, KINDS.police.color],
         'line-width': ['interpolate', ['linear'], ['zoom'], 11, 3, 17, 7],
       } });
-    setStatus('Carregando locais…', true);
-    loadView();
+    setStatus('Carregando pontos de Maricá…', true);
+    await ready;
+    addBoundaryLayers();
+    countStatus();
   });
 
   /* ---------- painel ---------- */
   $('#rotasGo').addEventListener('click', () => { lastTargets = null; traceRoutes(); });
-  document.querySelectorAll('.rotas__legend input').forEach((cb) =>
-    cb.addEventListener('change', () => { cb.checked ? hidden.delete(cb.dataset.kind) : hidden.add(cb.dataset.kind); countStatus(); })
-  );
+  document.querySelectorAll('.rotas__legend input').forEach((cb) => {
+    if (!cb.checked) hidden.add(cb.dataset.kind);
+    cb.addEventListener('change', () => { cb.checked ? hidden.delete(cb.dataset.kind) : hidden.add(cb.dataset.kind); countStatus(); });
+  });
   $('#rotasSearch').addEventListener('submit', async (e) => {
     e.preventDefault();
     const q = $('#rotasQ').value.trim();
     if (!q) return;
-    setStatus('Procurando endereço…', true);
+    setStatus('Procurando endereço em Maricá…', true);
     try {
-      const r = await fetchT('https://photon.komoot.io/api/?limit=1&lat=-15.8&lon=-47.9&q=' + encodeURIComponent(q));
+      const bb = BBOX.map((v) => v.toFixed(4)).join(',');
+      const r = await fetchT(`https://photon.komoot.io/api/?limit=8&bbox=${bb}&lat=${START[1]}&lon=${START[0]}&q=` + encodeURIComponent(q + ' Maricá'));
       const j = await r.json();
-      if (!j.features.length) return setStatus('Endereço não encontrado.');
-      const ll = j.features[0].geometry.coordinates;
+      const f = j.features.find((x) => inMarica(x.geometry.coordinates));
+      if (!f) return setStatus('Endereço não encontrado em Maricá.');
+      const ll = f.geometry.coordinates;
       lastTargets = null;
-      origin.setLngLat(ll);
+      origin.setLngLat(ll); lastGood = ll;
       map.flyTo({ center: ll, zoom: 15 });
-      if (routed) traceRoutes();
+      if (routed) traceRoutes(); else setStatus('Ponto de partida definido · clique em “Traçar rotas seguras”');
     } catch (err) { setStatus('Busca indisponível no momento.'); }
   });
+  }
 })();
