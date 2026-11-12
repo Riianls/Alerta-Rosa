@@ -1,624 +1,206 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="branco">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Alerta Rosa — proteção, privacidade e acolhimento</title>
-<meta name="description" content="Alerta Rosa: plataforma tecnológica em desenvolvimento para proteger mulheres, crianças e adolescentes em situação de vulnerabilidade.">
-<meta name="theme-color" content="#000000">
-<meta name="referrer" content="no-referrer">
-<meta property="og:type" content="website">
-<meta property="og:locale" content="pt_BR">
-<meta property="og:title" content="Alerta Rosa — proteção, privacidade e acolhimento">
-<meta property="og:description" content="Plataforma em desenvolvimento para proteger mulheres, crianças e adolescentes.">
-<link rel="icon" type="image/png" href="img/favicon.png">
-<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alerta Rosa</title>
+<meta name="description" content="Alerta Rosa — cuidado, informação e prevenção.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=3">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
 </head>
 <body>
-<a class="skip" href="#main">Pular para o conteúdo</a>
-<!-- Ícones (sprite SVG) -->
-<svg width="0" height="0" style="position:absolute" aria-hidden="true">
-<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></symbol>
-<symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/></symbol>
-<symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-6 7-11a7 7 0 10-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></symbol>
-<symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0113 0"/><circle cx="17" cy="9" r="2.5"/><path d="M17 14.5a5 5 0 014.5 5"/></symbol>
-<symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></symbol>
-<symbol id="i-eye" viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 6.2A9 9 0 0121 12a13 13 0 01-2.7 3.5M6.3 7.6A13 13 0 003 12s3.5 7 9 7a9 9 0 003.4-.7"/></symbol>
-<symbol id="i-cpu" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></symbol>
-<symbol id="i-book" viewBox="0 0 24 24"><path d="M4 4h10a4 4 0 014 4v12H8a4 4 0 01-4-4z"/><path d="M8 8h6"/></symbol>
-<symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.5-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.5-7 10-7 10z"/></symbol>
-<symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1"/></symbol>
-<symbol id="i-radio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M7.8 7.8a6 6 0 000 8.4M16.2 7.8a6 6 0 010 8.4M4.9 4.9a10 10 0 000 14.2M19.1 4.9a10 10 0 010 14.2"/></symbol>
-<symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 18a4 4 0 01-.5-8 6 6 0 0111.5 1.5A3.5 3.5 0 0117.5 18z"/></symbol>
-</svg>
 
-<div class="bar" role="region" aria-label="Aviso de emergência">
-  <p><strong>Em perigo agora?</strong> Ligue <a href="tel:190">190</a>. Mulheres: <a href="tel:180">180</a>. Crianças e adolescentes: <a href="tel:100">100</a>.</p>
-  <a class="quick" id="quickExit" href="https://www.google.com.br/" rel="noopener noreferrer" title="Sai deste site (ou aperte Esc duas vezes)">Saída rápida</a>
+<!-- LOADER -->
+<div class="loader" id="loader" role="status" aria-label="Carregando">
+  <div class="loader__stripes" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="loader__word" aria-hidden="true">
+    <span class="loader__mask"><span class="loader__w">Alerta</span></span>
+    <span class="loader__mask"><em class="loader__w loader__serif">rosa</em></span>
+    <i class="loader__dot"></i>
+  </div>
 </div>
 
-<header class="nav"><div class="wrap">
-  <a class="brand" href="#inicio"><img class="brand-logo" src="img/logo.png" alt="" width="46" height="46"><span>Alerta<b>Rosa</b></span></a>
-  <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir menu">☰</button>
-  <nav id="menu" aria-label="Principal">
-  <a href="#proposito">Propósito</a>
-  <a href="#funcionalidades">Recursos</a>
-  <a href="#demo">Demo SOS</a>
-  <a href="#mapa">Rotas Seguras</a>
-  <a href="#biblioteca">Biblioteca</a>
-  <a href="#tecnologias">Tecnologias</a>
-  <a href="#como-funciona">Como funciona</a>
-  <a href="#painel">Painel</a>
-  <a href="#privacidade">Privacidade</a>
-  <a class="btn sm" href="#contato">Contato</a>
+<div class="grain" aria-hidden="true"></div>
+<div class="cols" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+<div class="scene" id="scene" aria-hidden="true"></div>
+
+<!-- HEADER -->
+<header class="top">
+  <a class="brand" href="#home" data-link>
+    <span class="brand__mark">a<i></i>r</span>
+    <span class="mono brand__name">Alerta Rosa</span>
+  </a>
+  <div class="mono top__clock"><span class="dim">Brasil</span> <span id="clock">--:--</span></div>
+</header>
+
+<!-- TEMA -->
+<button class="toggle mono" id="themeToggle" aria-label="Alternar tema">
+  <span class="t-a">Branco</span><span class="toggle__sw"><i></i></span><span class="t-b">Rosa</span>
+</button>
+
+<!-- NAV -->
+<nav class="pill" aria-label="Seções">
+  <a href="#home" data-link class="is-active"><span class="mono n">01</span><span class="mono l">Início</span></a>
+  <a href="#about" data-link><span class="mono n">02</span><span class="mono l">Sobre</span></a>
+  <a href="#pilares" data-link><span class="mono n">03</span><span class="mono l">Pilares</span></a>
+  <a href="#work" data-link><span class="mono n">04</span><span class="mono l">Projetos</span></a>
+  <a href="#rotas" data-link><span class="mono n">05</span><span class="mono l">Rotas</span></a>
+  <a href="#contact" data-link><span class="mono n">06</span><span class="mono l">Contato</span></a>
 </nav>
-</div></header>
 
-<main id="main">
-<section class="hero dark" id="inicio"><div class="wrap hero-grid">
-  <div>
-    <h1>Pedir ajuda não deveria ser perigoso.</h1>
-    <p class="lead">O Alerta Rosa é uma plataforma pensada para proteger mulheres, crianças e adolescentes: alerta rápido, rede de apoio e privacidade em cada decisão de projeto.</p>
-    <div class="cta"><a class="btn" href="#demo">Testar a demonstração</a><a class="btn ghost" href="#como-funciona">Como funciona</a></div>
-    <p class="note">Este site apresenta um protótipo institucional. O aplicativo ainda está em desenvolvimento e não está disponível.</p>
+<main>
+  <!-- HERO -->
+  <section id="home" class="hero" data-pose="home" data-nav="0">
+    <h1 class="hero__title" aria-label="Alerta Rosa">
+      <span class="hero__line" aria-hidden="true">ALERTA</span>
+      <span class="hero__line hero__line--2" aria-hidden="true">ROSA<i class="hero__dot"></i></span>
+    </h1>
+    <div class="hero__rule rule"></div>
+    <div class="hero__foot">
+      <p class="mono hero__role" data-in>Cuidado, informação<br>&amp; prevenção</p>
+      <p class="hero__tag" data-in>Transformo <em class="serif">atenção</em><br>em cuidado que salva.</p>
+      <a class="mono hero__scroll" href="#about" data-link data-in>Role<span class="hero__scroll-line"></span></a>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track" id="marquee">
+      <span>Cuidar <em class="serif">é</em> prevenir</span><b>✦</b><span>Alerta Rosa</span><b>✦</b><span>Informação <em class="serif">que</em> protege</span><b>✦</b>
+      <span>Cuidar <em class="serif">é</em> prevenir</span><b>✦</b><span>Alerta Rosa</span><b>✦</b><span>Informação <em class="serif">que</em> protege</span><b>✦</b>
+    </div>
   </div>
-  <div class="orb" aria-hidden="true"><span></span><span></span><span class="core">SOS</span></div>
-</div></section>
 
-<section id="proposito" class="petal"><div class="wrap split">
-  <div>
-    <h2>Tecnologia a serviço de quem mais precisa de proteção</h2>
-    <p>Quando quem ameaça está por perto, até pedir ajuda é arriscado. O Alerta Rosa nasce para reduzir esse risco: um caminho rápido, discreto e confiável entre quem está em perigo e quem pode ajudar.</p>
-    <p>Mais do que um botão, é um projeto que será construído em diálogo com especialistas, organizações e serviços oficiais da rede de proteção.</p>
-  </div>
-  <ul class="vals">
-    <li><b>Acolhimento.</b> Linguagem simples e sem julgamento.</li>
-    <li><b>Privacidade.</b> Cada pessoa decide quem vê o quê.</li>
-    <li><b>Confiabilidade.</b> Funciona quando mais importa e diz com honestidade o que ainda não faz.</li>
-  </ul>
-</div></section>
+  <!-- SOBRE -->
+  <section id="about" class="section about" data-pose="about" data-nav="1">
+    <div class="section-head mono"><span><span class="idx">02</span> — Sobre</span><span class="dim">Propósito &amp; origem</span></div>
+    <div class="about__body">
+      <h2 class="big split">Um lembrete <em class="serif">rosa</em> de que o cuidado começa antes do problema.</h2>
+      <div class="about__cols">
+        <p data-reveal>O Alerta Rosa reúne informação clara, acolhimento e tecnologia para que mais pessoas reconheçam sinais cedo e saibam onde buscar ajuda.</p>
+        <p data-reveal>Cada camada do projeto — conteúdo, rede de apoio, ferramentas digitais — se encaixa como peças de uma mesma pilha: sozinhas são frágeis, juntas sustentam.</p>
+      </div>
+      <dl class="stats">
+        <div data-reveal><dt class="mono dim">Pessoas alcançadas</dt><dd><span class="count" data-to="12000">0</span>+</dd></div>
+        <div data-reveal><dt class="mono dim">Parceiros</dt><dd><span class="count" data-to="48">0</span></dd></div>
+        <div data-reveal><dt class="mono dim">Ações realizadas</dt><dd><span class="count" data-to="320">0</span></dd></div>
+      </dl>
+    </div>
+  </section>
 
-<section id="funcionalidades"><div class="wrap">
-  <h2>O que o Alerta Rosa vai oferecer</h2>
-  <p class="lead">Cada recurso mostra a etapa planejada: nada abaixo está pronto para uso ainda.</p>
-  <ul class="feat">
-    <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-shield"/></svg><h3>Botão SOS</h3><span class="tag t-mvp">MVP</span><p>Segure por 2 segundos para acionar. Evita toques acidentais e avisa a rede de apoio.</p></li>
-    <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-mic"/></svg><h3>Acionamento por voz</h3><span class="tag t-f2">Fase 2</span><p>Palavra-código reconhecida no próprio aparelho, sem enviar áudio para a nuvem.</p></li>
-    <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-pin"/></svg><h3>Localização em tempo real</h3><span class="tag t-mvp">MVP</span><p>Compartilhada só durante o alerta ou o trajeto, e encerrada por você.</p></li>
-    <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-users"/></svg><h3>Rede de Guardiãs</h3><span class="tag t-mvp">MVP</span><p>Pessoas de confiança que você escolhe e que recebem o alerta com a sua localização.</p></li>
-    <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-lock"/></svg><h3>Cofre de evidências</h3><span class="tag t-mvp">MVP</span><p>Fotos, áudios e anotações cifrados, com impressão digital (hash) e data para checar a integridade.</p></li>
-    <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-eye"/></svg><h3>Interface discreta</h3><span class="tag t-mvp">MVP</span><p>Ícone e nome neutros e PIN de coação, que abre uma tela falsa e envia um alerta silencioso.</p></li>
-    <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-cpu"/></svg><h3>IA de apoio</h3><span class="tag t-f2">Fase 2</span><p>Sugere atenção a padrões de risco, no aparelho. Não decide por você nem aciona ninguém sozinha.</p></li>
-    <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-book"/></svg><h3>Biblioteca de direitos</h3><span class="tag t-mvp">MVP</span><p>Informação clara sobre tipos de violência, Lei Maria da Penha e onde buscar ajuda.</p></li>
-    <li><svg class="i" aria-hidden="true" focusable="false"><use href="#i-heart"/></svg><h3>Crianças e adolescentes</h3><span class="tag t-f2">Fase 2</span><p>Canal adaptado, com adulto de confiança e orientação ao Disque 100. Exige validação com especialistas.</p></li>
-  </ul>
-</div></section>
-
-<section id="demo" class="pink"><div class="wrap demo">
-  <div class="demo-content">
-    <h2>Teste o botão SOS</h2>
-    <p>Mantenha o botão pressionado por 2 segundos (toque, mouse ou tecla Espaço/Enter). Veja o que o aplicativo real fará.</p>
-    <p class="warn" role="note"><strong>Simulação:</strong> nenhum alerta, localização ou gravação é enviado ou feito.</p>
-    <noscript><p class="warn">A demonstração precisa de JavaScript. Ative-o no navegador para testar.</p></noscript>
-    <ol class="steps" id="demoSteps">
-      <li>Avisaria suas Guardiãs com alerta prioritário</li>
-      <li>Compartilharia sua localização enquanto o alerta durar</li>
-      <li>Iniciaria uma gravação cifrada, guardada no aparelho</li>
-      <li>Mostraria como ligar para 190, 180 ou 100</li>
+  <!-- PILARES -->
+  <section id="pilares" class="section pilares" data-pose="expertise" data-nav="2">
+    <div class="section-head mono"><span><span class="idx">03</span> — Pilares</span><span class="dim">Passe o mouse para destacar a camada</span></div>
+    <h2 class="big split">Cinco camadas, <em class="serif">uma</em> pilha.</h2>
+    <ol class="layers">
+      <li data-layer="4" data-reveal><span class="mono dim">01</span><span class="layers__t">Informação</span><span class="layers__d">Conteúdo direto, sem jargão, sobre sinais e prevenção.</span></li>
+      <li data-layer="3" data-reveal><span class="mono dim">02</span><span class="layers__t">Prevenção</span><span class="layers__d">Lembretes, autoexame e rotinas de acompanhamento.</span></li>
+      <li data-layer="2" data-reveal><span class="mono dim">03</span><span class="layers__t">Acolhimento</span><span class="layers__d">Escuta e orientação para quem precisa de apoio.</span></li>
+      <li data-layer="1" data-reveal><span class="mono dim">04</span><span class="layers__t">Tecnologia</span><span class="layers__d">Ferramentas digitais que aproximam pessoas e serviços.</span></li>
+      <li data-layer="0" data-reveal><span class="mono dim">05</span><span class="layers__t">Comunidade</span><span class="layers__d">Rede de parceiros, voluntários e profissionais.</span></li>
     </ol>
-    <p id="demoCall" class="demo-call" hidden>Em perigo de verdade? Ligue <a href="tel:190">190</a>, <a href="tel:180">180</a> ou <a href="tel:100">100</a>.</p>
-    <button id="demoReset" class="btn ghost" type="button" hidden>Cancelar simulação</button>
-  </div>
-  <div class="sos-wrap" id="sosWrap">
-    <div class="sos-stage" id="sosStage">
-      <!-- Ondas de choque / radar 3D -->
-      <div class="sos-radar" id="sosRadar" aria-hidden="true">
-        <span class="sos-wave wave-1"></span>
-        <span class="sos-wave wave-2"></span>
-        <span class="sos-wave wave-3"></span>
-      </div>
+  </section>
 
-      <!-- Anel luminoso SVG com progresso de 2s -->
-      <svg class="sos-ring-svg" viewBox="0 0 260 260" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4;">
-        <defs>
-          <linearGradient id="sosRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#ff3d8b" />
-            <stop offset="60%" stop-color="#ff7da9" />
-            <stop offset="100%" stop-color="#ffffff" />
-          </linearGradient>
-          <filter id="sosNeonGlow" x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur stdDeviation="4" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-        </defs>
-        <circle class="sos-ring-track" cx="130" cy="130" r="118" fill="none" stroke="rgba(255, 255, 255, 0.1)" stroke-width="6" />
-        <circle class="sos-ring-progress" id="sosRingProgress" cx="130" cy="130" r="118" fill="none" stroke="url(#sosRingGrad)" stroke-width="6" stroke-linecap="round" />
-      </svg>
-
-      <!-- Bezel cilíndrico de base metálica chanfrada -->
-      <div class="sos-bezel" aria-hidden="true"></div>
-
-      <!-- Botão SOS 3D físico -->
-      <button id="sos" class="sos" type="button" aria-describedby="sosHint">
-        <span class="sos-surface">
-          <span class="sos-gloss" aria-hidden="true"></span>
-          <span id="sosLabel">SOS</span>
-        </span>
-      </button>
-    </div>
-    <p id="sosHint" class="sos-hint">Segure por 2 segundos</p>
-    <p id="sosLive" class="sr" aria-live="polite"></p>
-  </div>
-</div></section>
-
-<!-- ==========================================
-     MAPA DE ROTAS SEGURAS E APOIO
-========================================== -->
-<section id="mapa" class="petal">
-  <div class="wrap">
-    <div class="section-head">
-      <span class="contato-tag">TERRITÓRIO PROTEGIDO</span>
-      <h2>Rotas Seguras e Rede de Apoio</h2>
-      <p class="lead">Mapeamento dinâmico de delegacias da mulher, unidades de pronto atendimento, pontos de acolhimento parceiros e corredores com iluminação reforçada para deslocamentos protegidos.</p>
-    </div>
-
-    <!-- Barra de Filtros e Status -->
-    <div class="map-toolbar">
-      <div class="map-filters" role="group" aria-label="Filtrar pontos no mapa">
-        <button type="button" class="map-filter-btn active" data-filter="all">Todos os Pontos (6)</button>
-        <button type="button" class="map-filter-btn" data-filter="deam"><svg class="i sm" aria-hidden="true"><use href="#i-shield"/></svg> Delegacias (DEAM)</button>
-        <button type="button" class="map-filter-btn" data-filter="saude"><svg class="i sm" aria-hidden="true"><use href="#i-heart"/></svg> Hospitais & Saúde</button>
-        <button type="button" class="map-filter-btn" data-filter="apoio"><svg class="i sm" aria-hidden="true"><use href="#i-users"/></svg> Pontos de Acolhimento</button>
-      </div>
-      <div class="map-status-pill">
-        <span class="pulse-dot"></span> Monitoramento Ativo 24h
+  <!-- VIDEO SCROLL (rolagem controla o vídeo) -->
+  <section id="vscroll" class="vscroll" aria-label="Vídeo controlado pela rolagem">
+    <div class="vscroll__sticky">
+      <div class="vscroll__band">
+        <canvas class="vscroll__video" id="vscrollCanvas"></canvas>
+        <svg class="vscroll__wave vscroll__wave--top" aria-hidden="true" preserveAspectRatio="none"><path class="vw-mask"/><path class="vw-line2"/><path class="vw-line"/></svg>
+        <svg class="vscroll__wave vscroll__wave--bot" aria-hidden="true" preserveAspectRatio="none"><path class="vw-mask"/><path class="vw-line2"/><path class="vw-line"/></svg>
       </div>
     </div>
+  </section>
 
-    <!-- Container do Mapa Interativo -->
-    <div class="map-wrapper" id="mapWrapper" role="region" aria-label="Mapa interativo com rotas seguras e pontos de acolhimento">
-      <!-- Controles Flutuantes -->
-      <div class="map-controls">
-        <button type="button" id="mapZoomIn" class="map-ctrl-btn" title="Aproximar zoom" aria-label="Aumentar zoom">+</button>
-        <button type="button" id="mapZoomOut" class="map-ctrl-btn" title="Afastar zoom" aria-label="Diminuir zoom">−</button>
-        <button type="button" id="mapReset" class="map-ctrl-btn" title="Centralizar mapa" aria-label="Centralizar visualização">⌖</button>
-        <button type="button" id="mapToggleRoutes" class="map-ctrl-btn active" title="Alternar traçado de rotas" aria-label="Alternar traçado de rotas">⚡</button>
+  <!-- PROJETOS (horizontal) -->
+  <section id="work" class="work" data-pose="work" data-nav="3">
+    <div class="work__pin">
+      <div class="section-head mono"><span><span class="idx">04</span> — Projetos</span><span class="dim">Arraste a rolagem →</span></div>
+      <div class="work__track" id="workTrack">
+        <div class="work__intro">
+          <h2 class="big">Ações que <em class="serif">acendem</em> o alerta.</h2>
+        </div>
+        <article class="card"><div class="card__img g1"><span>01</span></div><div class="card__meta mono"><span>Campanha</span><span class="dim">2026</span></div><h3>Outubro em rosa</h3><p>Mobilização anual com conteúdo, eventos e mutirões de orientação.</p></article>
+        <article class="card"><div class="card__img g2"><span>02</span></div><div class="card__meta mono"><span>Aplicativo</span><span class="dim">2026</span></div><h3>Lembrete Rosa</h3><p>App de lembretes de autocuidado e agenda de exames.</p></article>
+        <article class="card"><div class="card__img g3"><span>03</span></div><div class="card__meta mono"><span>Mapa</span><span class="dim">2025</span></div><h3>Rede de apoio</h3><p>Mapa interativo com pontos de atendimento e acolhimento.</p></article>
+        <article class="card"><div class="card__img g4"><span>04</span></div><div class="card__meta mono"><span>Educação</span><span class="dim">2025</span></div><h3>Rodas de conversa</h3><p>Encontros em escolas e empresas para falar de prevenção.</p></article>
       </div>
-
-      <!-- Dica de Navegação -->
-      <div class="map-hint" aria-hidden="true">
-        <span>Arraste para navegar · Use os botões para zoom · Clique nos pontos</span>
-      </div>
-
-      <!-- Conteúdo do Mapa (Arrastável) -->
-      <div class="map-content" id="mapContent">
-        <!-- Fundo Imagem Mapa Urbano -->
-        <div class="map-bg" id="mapBg"></div>
-
-        <!-- Camada SVG com as Rotas Seguras -->
-        <svg class="map-routes-layer" id="mapRoutesSvg" viewBox="0 0 1668 943" preserveAspectRatio="none" aria-hidden="true">
-          <!-- Rota 1: Corredor Estação Central - DEAM -->
-          <path id="route1" class="route-line" d="M 270,380 Q 420,310 600,290 T 770,255" />
-          <!-- Rota 2: Corredor Acolhimento Vila Rosa -->
-          <path id="route2" class="route-line" d="M 770,255 Q 920,340 1060,450 T 1140,460" />
-          <!-- Rota 3: Corredor de Emergência Hospitalar -->
-          <path id="route3" class="route-line" d="M 570,620 Q 500,520 440,440 T 270,380" />
-          <!-- Rota 4: Corredor Conector Seguro -->
-          <path id="route4" class="route-line" d="M 1060,450 Q 990,560 900,650 T 570,620" />
-        </svg>
-
-        <!-- Pins Interativos -->
-        <div class="map-pin pin-deam" style="top: 27%; left: 46%;" data-id="1" tabindex="0" role="button" aria-label="1ª DEAM - Delegacia da Mulher">
-          <span class="pin-badge"><svg class="i xs"><use href="#i-shield"/></svg></span>
-          <span class="pin-text">1ª DEAM · Delegacia da Mulher</span>
-          <span class="pin-pulse"></span>
-        </div>
-
-        <div class="map-pin pin-saude" style="top: 66%; left: 34%;" data-id="2" tabindex="0" role="button" aria-label="Hospital da Mulher de Referência">
-          <span class="pin-badge"><svg class="i xs"><use href="#i-heart"/></svg></span>
-          <span class="pin-text">Hospital Materno de Referência</span>
-          <span class="pin-pulse"></span>
-        </div>
-
-        <div class="map-pin pin-apoio" style="top: 49%; left: 68%;" data-id="3" tabindex="0" role="button" aria-label="Ponto de Acolhimento Comunitário Rosa">
-          <span class="pin-badge"><svg class="i xs"><use href="#i-users"/></svg></span>
-          <span class="pin-text">Ponto de Acolhimento Rosa</span>
-          <span class="pin-pulse"></span>
-        </div>
-
-        <div class="map-pin pin-apoio" style="top: 39%; left: 16%;" data-id="4" tabindex="0" role="button" aria-label="Centro de Referência da Mulher">
-          <span class="pin-badge"><svg class="i xs"><use href="#i-book"/></svg></span>
-          <span class="pin-text">Centro de Referência da Mulher</span>
-          <span class="pin-pulse"></span>
-        </div>
-
-        <div class="map-pin pin-deam" style="top: 69%; left: 54%;" data-id="5" tabindex="0" role="button" aria-label="Base Comunitária 24h">
-          <span class="pin-badge"><svg class="i xs"><use href="#i-shield"/></svg></span>
-          <span class="pin-text">Base Comunitária Segura 24h</span>
-          <span class="pin-pulse"></span>
-        </div>
-
-        <div class="map-pin pin-saude" style="top: 24%; left: 74%;" data-id="6" tabindex="0" role="button" aria-label="Pronto-Socorro Municipal Zona Leste">
-          <span class="pin-badge"><svg class="i xs"><use href="#i-heart"/></svg></span>
-          <span class="pin-text">Pronto-Socorro Municipal 24h</span>
-          <span class="pin-pulse"></span>
-        </div>
-      </div>
-
-      <!-- Popover de Detalhes -->
-      <div class="map-popover" id="mapPopover" aria-live="polite">
-        <button type="button" class="popover-close" id="popoverClose" aria-label="Fechar detalhes">&times;</button>
-        <div class="popover-badge" id="popoverBadge">DELEGACIA ESPECIALIZADA</div>
-        <h3 id="popoverTitle">1ª DEAM - Delegacia da Mulher</h3>
-        <p class="popover-address" id="popoverAddress">Av. Central da Paz, 1020 — Centro</p>
-        <div class="popover-info-grid">
-          <div><strong>Atendimento:</strong> <span id="popoverHours">24 Horas Ininterruptas</span></div>
-          <div><strong>Telefone:</strong> <span id="popoverPhone">Ligue 180 / (11) 3224-5000</span></div>
-        </div>
-        <p class="popover-desc" id="popoverDesc">Atendimento humanizado, registro imediato de ocorrências, pedido de Medida Protetiva de Urgência e salas privativas de acolhimento.</p>
-        <div class="popover-actions">
-          <a href="tel:180" class="btn sm" id="popoverCallBtn">Ligar para a unidade</a>
-          <button type="button" class="btn sm ghost" id="popoverRouteBtn">Destacar rota segura</button>
-        </div>
-      </div>
+      <div class="work__progress"><i id="workBar"></i></div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ==========================================
-     BIBLIOTECA DE DIREITOS E EMPODERAMENTO
-========================================== -->
-<section id="biblioteca" class="dark">
-  <div class="wrap">
-    <div class="section-head">
-      <span class="contato-tag" style="background: rgba(255,61,139,.2); color: var(--pink);">CONHECIMENTO É PROTEÇÃO</span>
-      <h2>Biblioteca de Direitos e Empoderamento</h2>
-      <p class="lead" style="color: #d4d4da;">Conhecimento compartilhado fortalece a autonomia e salva vidas. Baixe gratuitamente materiais educativos, clássicos sobre direitos e histórias inspiradoras de resistência feminina.</p>
+  <!-- PROCESSO -->
+  <section id="approach" class="section approach" data-pose="approach" data-nav="3">
+    <div class="section-head mono"><span><span class="idx">✦</span> — Como funciona</span><span class="dim">Peça por peça</span></div>
+    <h2 class="big split">Montado <em class="serif">camada</em> por camada.</h2>
+    <div class="steps">
+      <div class="step" data-reveal><span class="mono step__n">01</span><h3>Ouvir</h3><p>Entendemos a realidade de cada comunidade antes de agir.</p></div>
+      <div class="step" data-reveal><span class="mono step__n">02</span><h3>Informar</h3><p>Traduzimos o essencial em linguagem simples e acessível.</p></div>
+      <div class="step" data-reveal><span class="mono step__n">03</span><h3>Conectar</h3><p>Ligamos pessoas a serviços, profissionais e redes de apoio.</p></div>
+      <div class="step" data-reveal><span class="mono step__n">04</span><h3>Acompanhar</h3><p>Seguimos junto, com lembretes e retorno contínuo.</p></div>
     </div>
+  </section>
 
-    <!-- Barra de Busca e Categorias -->
-    <div class="lib-toolbar">
-      <div class="lib-search-box">
-        <svg class="i sm" aria-hidden="true"><use href="#i-book"/></svg>
-        <input type="search" id="libSearch" placeholder="Buscar por título, autora ou assunto..." aria-label="Buscar livros na biblioteca">
+  <!-- ROTAS SEGURAS -->
+  <section id="rotas" class="section rotas" data-pose="rotas" data-nav="4">
+    <div class="section-head mono"><span><span class="idx">05</span> — Rotas seguras</span><span class="dim">Delegacias, hospitais &amp; caminhos</span></div>
+    <h2 class="big split">Saiba <em class="serif">sempre</em> para onde ir.</h2>
+    <div class="rotas__grid">
+      <div class="rotas__frame" data-lenis-prevent>
+        <div id="rotasMap" class="rotas__map" role="region" aria-label="Mapa de rotas seguras"></div>
+        <div class="rotas__status mono" id="rotasStatus" aria-live="polite">Carregando mapa…</div>
       </div>
-      <div class="lib-cats" role="group" aria-label="Filtrar por categoria">
-        <button type="button" class="lib-cat-btn active" data-cat="all">Todas as Obras (10)</button>
-        <button type="button" class="lib-cat-btn" data-cat="classicos">Clássicos do Feminismo</button>
-        <button type="button" class="lib-cat-btn" data-cat="direitos">Direitos & Sociedade</button>
-        <button type="button" class="lib-cat-btn" data-cat="vozes">Vozes & Resistência</button>
-      </div>
+      <aside class="rotas__panel" data-reveal>
+        <form class="rotas__search" id="rotasSearch" role="search">
+          <input id="rotasQ" type="search" placeholder="Buscar endereço ou cidade" aria-label="Buscar endereço ou cidade" autocomplete="off">
+          <button type="submit" aria-label="Buscar"><i data-lucide="search"></i></button>
+        </form>
+        <fieldset class="rotas__legend">
+          <legend class="mono dim">Mostrar no mapa</legend>
+          <label><input type="checkbox" data-kind="ddm" checked><span class="pin pin--ddm pin--sm"><i data-lucide="shield-alert"></i></span>Delegacia da Mulher</label>
+          <label><input type="checkbox" data-kind="police" checked><span class="pin pin--police pin--sm"><i data-lucide="shield-check"></i></span>Delegacias / Polícia</label>
+          <label><input type="checkbox" data-kind="hospital" checked><span class="pin pin--hospital pin--sm"><i data-lucide="hospital"></i></span>Hospitais</label>
+        </fieldset>
+        <button class="rotas__go" id="rotasGo" type="button"><i data-lucide="route"></i>Traçar rotas seguras</button>
+        <p class="rotas__hint">Clique no mapa ou arraste <span class="pin pin--origin pin--sm"><i data-lucide="navigation"></i></span> para definir o ponto de partida, ou use <i data-lucide="locate-fixed"></i> para usar sua localização.</p>
+        <ol class="rotas__results" id="rotasResults"></ol>
+        <p class="rotas__emerg mono">Emergência <a href="tel:190">190 Polícia</a> <a href="tel:180">180 Mulher</a> <a href="tel:192">192 SAMU</a></p>
+      </aside>
     </div>
+    <p class="mono dim rotas__src">Locais e rotas reais: © colaboradores do OpenStreetMap · Photon · OSRM · Imagens de satélite © Esri, Maxar</p>
+  </section>
 
-    <!-- Carrossel Estilo Netflix -->
-    <div class="lib-carousel-container" aria-roledescription="carousel" aria-label="Livros e cartilhas sobre direitos e empoderamento">
-      <button type="button" class="lib-nav-arrow left" id="libPrev" aria-label="Rolar livros para a esquerda">&#10094;</button>
-
-      <div class="lib-carousel-track" id="libTrack">
-        <!-- Livro 1 -->
-        <article class="lib-card" data-cat="classicos" data-index="0">
-          <div class="lib-card-cover">
-            <img src="img/Mulheres.jpg" alt="Capa do livro Mulheres que Correm com os Lobos" loading="lazy" onerror="this.src='Imagens/Mulheres.jpg'">
-            <span class="lib-tag">CLÁSSICO</span>
-          </div>
-          <div class="lib-card-body">
-            <h4>Mulheres que Correm com os Lobos</h4>
-            <span class="lib-author">Clarissa Pinkola Estés</span>
-            <div class="lib-card-btns">
-              <button type="button" class="btn sm lib-btn-info" data-index="0">Ver Sinopse</button>
-              <button type="button" class="btn sm ghost lib-btn-dl" data-index="0" title="Baixar Guia em PDF">Baixar Guia</button>
-            </div>
-          </div>
-        </article>
-
-        <!-- Livro 2 -->
-        <article class="lib-card" data-cat="direitos" data-index="1">
-          <div class="lib-card-cover">
-            <img src="img/Sejamos.jpg" alt="Capa do livro Sejamos Todos Feministas" loading="lazy" onerror="this.src='Imagens/Sejamos.jpg'">
-            <span class="lib-tag">DIREITOS</span>
-          </div>
-          <div class="lib-card-body">
-            <h4>Sejamos Todos Feministas</h4>
-            <span class="lib-author">Chimamanda Ngozi Adichie</span>
-            <div class="lib-card-btns">
-              <button type="button" class="btn sm lib-btn-info" data-index="1">Ver Sinopse</button>
-              <button type="button" class="btn sm ghost lib-btn-dl" data-index="1" title="Baixar Guia em PDF">Baixar Guia</button>
-            </div>
-          </div>
-        </article>
-
-        <!-- Livro 3 -->
-        <article class="lib-card" data-cat="direitos" data-index="2">
-          <div class="lib-card-cover">
-            <img src="img/Mito.png" alt="Capa do livro O Mito da Beleza" loading="lazy" onerror="this.src='Imagens/Mito.png'">
-            <span class="lib-tag">SOCIEDADE</span>
-          </div>
-          <div class="lib-card-body">
-            <h4>O Mito da Beleza</h4>
-            <span class="lib-author">Naomi Wolf</span>
-            <div class="lib-card-btns">
-              <button type="button" class="btn sm lib-btn-info" data-index="2">Ver Sinopse</button>
-              <button type="button" class="btn sm ghost lib-btn-dl" data-index="2" title="Baixar Guia em PDF">Baixar Guia</button>
-            </div>
-          </div>
-        </article>
-
-        <!-- Livro 4 -->
-        <article class="lib-card" data-cat="classicos" data-index="3">
-          <div class="lib-card-cover">
-            <img src="img/Segundo.jpg" alt="Capa do livro O Segundo Sexo" loading="lazy" onerror="this.src='Imagens/Segundo.jpg'">
-            <span class="lib-tag">CLÁSSICO</span>
-          </div>
-          <div class="lib-card-body">
-            <h4>O Segundo Sexo</h4>
-            <span class="lib-author">Simone de Beauvoir</span>
-            <div class="lib-card-btns">
-              <button type="button" class="btn sm lib-btn-info" data-index="3">Ver Sinopse</button>
-              <button type="button" class="btn sm ghost lib-btn-dl" data-index="3" title="Baixar Guia em PDF">Baixar Guia</button>
-            </div>
-          </div>
-        </article>
-
-        <!-- Livro 5 -->
-        <article class="lib-card" data-cat="vozes" data-index="4">
-          <div class="lib-card-cover">
-            <img src="img/Passaro.jpg" alt="Capa do livro Eu Sei Por Que o Pássaro Canta na Gaiola" loading="lazy" onerror="this.src='Imagens/Passaro.jpg'">
-            <span class="lib-tag">VOZES</span>
-          </div>
-          <div class="lib-card-body">
-            <h4>Eu Sei Por Que o Pássaro Canta</h4>
-            <span class="lib-author">Maya Angelou</span>
-            <div class="lib-card-btns">
-              <button type="button" class="btn sm lib-btn-info" data-index="4">Ver Sinopse</button>
-              <button type="button" class="btn sm ghost lib-btn-dl" data-index="4" title="Baixar Guia em PDF">Baixar Guia</button>
-            </div>
-          </div>
-        </article>
-
-        <!-- Livro 6 -->
-        <article class="lib-card" data-cat="vozes" data-index="5">
-          <div class="lib-card-cover">
-            <img src="img/Extra.jpg" alt="Capa do livro Extraordinárias: Mulheres que Revolucionaram o Brasil" loading="lazy" onerror="this.src='Imagens/Extra.jpg'">
-            <span class="lib-tag">HISTÓRIA</span>
-          </div>
-          <div class="lib-card-body">
-            <h4>Extraordinárias</h4>
-            <span class="lib-author">Duda Porto & Aryane Cararo</span>
-            <div class="lib-card-btns">
-              <button type="button" class="btn sm lib-btn-info" data-index="5">Ver Sinopse</button>
-              <button type="button" class="btn sm ghost lib-btn-dl" data-index="5" title="Baixar Guia em PDF">Baixar Guia</button>
-            </div>
-          </div>
-        </article>
-
-        <!-- Livro 7 -->
-        <article class="lib-card" data-cat="vozes" data-index="6">
-          <div class="lib-card-cover">
-            <img src="img/Cor.jpg" alt="Capa do livro A Cor Púrpura" loading="lazy" onerror="this.src='Imagens/Cor.jpg'">
-            <span class="lib-tag">LITERATURA</span>
-          </div>
-          <div class="lib-card-body">
-            <h4>A Cor Púrpura</h4>
-            <span class="lib-author">Alice Walker</span>
-            <div class="lib-card-btns">
-              <button type="button" class="btn sm lib-btn-info" data-index="6">Ver Sinopse</button>
-              <button type="button" class="btn sm ghost lib-btn-dl" data-index="6" title="Baixar Guia em PDF">Baixar Guia</button>
-            </div>
-          </div>
-        </article>
-
-        <!-- Livro 8 -->
-        <article class="lib-card" data-cat="vozes" data-index="7">
-          <div class="lib-card-cover">
-            <img src="img/Despejo.jpg" alt="Capa do livro Quarto de Despejo" loading="lazy" onerror="this.src='Imagens/Despejo.jpg'">
-            <span class="lib-tag">MEMÓRIAS</span>
-          </div>
-          <div class="lib-card-body">
-            <h4>Quarto de Despejo</h4>
-            <span class="lib-author">Carolina Maria de Jesus</span>
-            <div class="lib-card-btns">
-              <button type="button" class="btn sm lib-btn-info" data-index="7">Ver Sinopse</button>
-              <button type="button" class="btn sm ghost lib-btn-dl" data-index="7" title="Baixar Guia em PDF">Baixar Guia</button>
-            </div>
-          </div>
-        </article>
-
-        <!-- Livro 9 -->
-        <article class="lib-card" data-cat="classicos" data-index="8">
-          <div class="lib-card-cover">
-            <img src="img/Bruxa.jpg" alt="Capa do livro Calibã e a Bruxa" loading="lazy" onerror="this.src='Imagens/Bruxa.jpg'">
-            <span class="lib-tag">CLÁSSICO</span>
-          </div>
-          <div class="lib-card-body">
-            <h4>Calibã e a Bruxa</h4>
-            <span class="lib-author">Silvia Federici</span>
-            <div class="lib-card-btns">
-              <button type="button" class="btn sm lib-btn-info" data-index="8">Ver Sinopse</button>
-              <button type="button" class="btn sm ghost lib-btn-dl" data-index="8" title="Baixar Guia em PDF">Baixar Guia</button>
-            </div>
-          </div>
-        </article>
-
-        <!-- Livro 10 -->
-        <article class="lib-card" data-cat="direitos" data-index="9">
-          <div class="lib-card-cover">
-            <img src="img/Classe.jpg" alt="Capa do livro Mulheres, Raça e Classe" loading="lazy" onerror="this.src='Imagens/Classe.jpg'">
-            <span class="lib-tag">DIREITOS</span>
-          </div>
-          <div class="lib-card-body">
-            <h4>Mulheres, Raça e Classe</h4>
-            <span class="lib-author">Angela Davis</span>
-            <div class="lib-card-btns">
-              <button type="button" class="btn sm lib-btn-info" data-index="9">Ver Sinopse</button>
-              <button type="button" class="btn sm ghost lib-btn-dl" data-index="9" title="Baixar Guia em PDF">Baixar Guia</button>
-            </div>
-          </div>
-        </article>
-      </div>
-
-      <button type="button" class="lib-nav-arrow right" id="libNext" aria-label="Rolar livros para a direita">&#10095;</button>
+  <!-- CONTATO -->
+  <section id="contact" class="section contact" data-pose="contact" data-nav="5">
+    <div class="section-head mono"><span><span class="idx">06</span> — Contato</span><span class="dim">Vamos conversar</span></div>
+    <h2 class="contact__title split">Acenda <em class="serif">o</em><br>alerta.</h2>
+    <div class="contact__links">
+      <a class="contact__mail" href="mailto:seu@email.com" data-reveal>seu@email.com <span>↗</span></a>
+      <ul class="mono" data-reveal>
+        <li><a href="#">Instagram</a></li>
+        <li><a href="#">WhatsApp</a></li>
+        <li><a href="#">LinkedIn</a></li>
+      </ul>
     </div>
-
-    <!-- Barra de Progresso do Carrossel -->
-    <div class="lib-progress-wrapper" aria-hidden="true">
-      <div class="lib-progress-bar" id="libProgressBar"></div>
-    </div>
-  </div>
-
-  <!-- Modal Interativo de Detalhes do Livro -->
-  <div class="book-modal-backdrop" id="bookModalBackdrop" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modalBookTitle">
-    <div class="book-modal-card">
-      <button type="button" class="book-modal-close" id="bookModalClose" aria-label="Fechar detalhes">&times;</button>
-      <div class="book-modal-grid">
-        <div class="book-modal-cover">
-          <img id="modalBookCover" src="" alt="Capa ampliada da obra">
-        </div>
-        <div class="book-modal-info">
-          <span class="lib-tag" id="modalBookTag">CLÁSSICO</span>
-          <h3 id="modalBookTitle">Título da Obra</h3>
-          <p class="modal-author" id="modalBookAuthor">Nome da Autora</p>
-          <div class="modal-synopsis">
-            <h4>Sobre a obra:</h4>
-            <p id="modalBookSynopsis">Sinopse da obra...</p>
-          </div>
-          <div class="modal-quote">
-            <blockquote id="modalBookQuote">"Citação da obra."</blockquote>
-          </div>
-          <div class="modal-actions">
-            <button type="button" class="btn" id="modalDownloadBtn">Baixar Guia de Leitura (PDF)</button>
-            <button type="button" class="btn ghost" id="modalCloseBtn">Fechar</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Toast Notification Flutuante -->
-  <div class="lib-toast" id="libToast" role="status" aria-live="polite">
-    <svg class="i xs" aria-hidden="true"><use href="#i-shield"/></svg>
-    <span id="libToastMsg">Download iniciado com sucesso!</span>
-  </div>
-</section>
-
-<section id="tecnologias" class="petal"><div class="wrap">
-  <h2>Tecnologias, com os limites ditos em voz alta</h2>
-  <p class="lead">Cada tecnologia entra onde traz ganho real de proteção, e não por moda.</p>
-  <div class="tech">
-    <div class="row"><h3><svg class="i" aria-hidden="true" focusable="false"><use href="#i-lock"/></svg>Criptografia ponta a ponta</h3><p>Evidências e mensagens só abertas por quem tem a chave.</p><p class="lim">Limite: perder a chave pode significar perder o acesso. A recuperação precisa ser desenhada com cuidado.</p><span class="tag t-mvp">MVP</span></div>
-    <div class="row"><h3><svg class="i" aria-hidden="true" focusable="false"><use href="#i-cloud"/></svg>Cloud</h3><p>Backup, sincronização e API, guardando apenas dados cifrados.</p><p class="lim">Limite: exige região e contratos adequados à LGPD e plano de resposta a incidentes.</p><span class="tag t-mvp">MVP</span></div>
-    <div class="row"><h3><svg class="i" aria-hidden="true" focusable="false"><use href="#i-cpu"/></svg>Edge AI</h3><p>Modelos rodando no aparelho (ex.: LiteRT, antigo TensorFlow Lite, e Core ML) para voz e padrões de risco.</p><p class="lim">Limite: há falsos positivos e negativos. A IA sugere e a pessoa decide.</p><span class="tag t-f2">Fase 2</span></div>
-    <div class="row"><h3><svg class="i" aria-hidden="true" focusable="false"><use href="#i-link"/></svg>Blockchain</h3><p>Ancora só o hash e a data de uma evidência, para provar que ela não foi alterada.</p><p class="lim">Limite: o conteúdo não vai para a rede. A validade jurídica depende da cadeia de custódia.</p><span class="tag t-f2">Fase 2</span></div>
-    <div class="row"><h3><svg class="i" aria-hidden="true" focusable="false"><use href="#i-radio"/></svg>Mesh P2P (Bluetooth e Wi-Fi Direct)</h3><p>Alerta sem internet, repassado entre aparelhos próximos.</p><p class="lim">Limite: depende de outras pessoas com o app por perto e de restrições do iOS e do Android.</p><span class="tag t-p">Pesquisa</span></div>
-    <div class="row"><h3><svg class="i" aria-hidden="true" focusable="false"><use href="#i-eye"/></svg>Provas de conhecimento zero (ZKP)</h3><p>Comprovar algo, como ser uma Guardiã verificada, sem revelar dados pessoais.</p><p class="lim">Limite: técnica complexa. Será usada só onde houver ganho claro de privacidade.</p><span class="tag t-p">Pesquisa</span></div>
-  </div>
-</div></section>
-
-<section id="como-funciona"><div class="wrap">
-  <h2>Como o sistema funciona</h2>
-  <ol class="flow">
-    <li><h3>Cadastro mínimo</h3><p>Só o necessário, com consentimento claro e opção de apagar tudo.</p></li>
-    <li><h3>Escolha das Guardiãs</h3><p>Você convida pessoas de confiança. Elas aceitam antes de receber alertas.</p></li>
-    <li><h3>Alerta</h3><p>Por toque longo, PIN de coação ou, no futuro, comando de voz.</p></li>
-    <li><h3>Resposta e registro</h3><p>As Guardiãs são avisadas, e as evidências ficam cifradas e verificáveis.</p></li>
-  </ol>
-  <div class="arch">
-    <div><b>Aparelho</b>App, cofre local, Edge AI e modo discreto</div>
-    <div><b>Canal seguro</b>TLS, notificações push e, em pesquisa, mesh</div>
-    <div><b>Nuvem</b>API, dados cifrados e logs de auditoria</div>
-    <div><b>Rede de apoio</b>Guardiãs e serviços parceiros</div>
-  </div>
-</div></section>
-
-<section id="painel" class="dark"><div class="wrap split">
-  <div>
-    <h2>Um olhar sobre o app</h2>
-    <p>Protótipo visual com <strong>dados fictícios</strong>. Não é o aplicativo funcionando.</p>
-    <ul class="list">
-      <li>Estado da proteção sempre visível.</li>
-      <li>Guardiãs e check-in de trajeto em um só lugar.</li>
-      <li>Evidências com impressão digital para conferir a integridade.</li>
-    </ul>
-  </div>
-  <div class="phone" role="img" aria-label="Tela de exemplo do aplicativo, com dados fictícios">
-    <div class="ok"><span class="dot"></span>Proteção ativa · 3 Guardiãs</div>
-    <div class="mini"><h3>Rede de Guardiãs</h3><span class="av">A</span><span class="av">B</span><span class="av">C</span></div>
-    <div class="mini"><h3>Check-in de trajeto</h3>Chegar em casa até 22:30.<br>Sem confirmação, as Guardiãs são avisadas.</div>
-    <div class="mini"><h3>Cofre de evidências</h3>Áudio, 14:02 <code>a3f9…c21e</code><br>Foto, 14:05 <code>7b10…e94d</code></div>
-  </div>
-</div></section>
-
-<section id="privacidade"><div class="wrap">
-  <h2>Privacidade, LGPD e acessibilidade desde o início</h2>
-  <div class="grid4">
-    <div><h3>LGPD</h3><p>Dados sensíveis com consentimento, minimização e relatório de impacto (RIPD). Atenção ao melhor interesse de crianças e adolescentes.</p></div>
-    <div><h3>Segurança</h3><p>Criptografia ponta a ponta, autenticação forte, logs de auditoria e testes de invasão antes de qualquer lançamento.</p></div>
-    <div><h3>Acessibilidade</h3><p>Meta WCAG 2.2 AA: leitor de tela, bom contraste, linguagem simples e, no futuro, Libras.</p></div>
-    <div><h3>Confiabilidade</h3><p>Fila de envio com conexão ruim, parcerias com serviços oficiais e avisos claros: não substitui 190, 180 ou 100.</p></div>
-  </div>
-</div></section>
-
-<section id="contato" class="contato-novo"><div class="wrap">
-  <div class="contato-header">
-    <span class="contato-tag">CONTATO</span>
-    <h2>Equipe e contato</h2>
-    <p>Quer apoiar, validar ou participar do projeto? Fale com a gente.</p>
-  </div>
-  <div class="contato-layout">
-    <div>
-      <h3 class="contato-subtitulo">Quem está por trás</h3>
-      <div class="team-nova">
-        <div class="person-nova">
-          <img class="person-foto" src="img/gustavo.jpg" alt="" width="68" height="68" loading="lazy">
-          <div class="person-info"><strong>Gustavo Medeiros</strong><span>Full Stack</span></div>
-        </div>
-        <div class="person-nova">
-          <img class="person-foto" src="img/leonardo.jpg" alt="" width="68" height="68" loading="lazy">
-          <div class="person-info"><strong>Leonardo Rodrigues</strong><span>Full Stack</span></div>
-        </div>
-        <div class="person-nova">
-          <img class="person-foto" src="img/pedro.jpg" alt="" width="68" height="68" loading="lazy">
-          <div class="person-info"><strong>Pedro Costa</strong><span>Full Stack</span></div>
-        </div>
-        <div class="person-nova">
-  <img class="person-foto" src="img/rian.jpg" alt="" width="68" height="68" loading="lazy">
-  <div class="person-info"><strong>Rian Lima</strong><span>Full Stack</span></div>
-</div>
-<div class="person-nova">
-  <img class="person-foto" src="img/wellington.jpg" alt="" width="68" height="68" loading="lazy">
-  <div class="person-info"><strong>Wellington Gama</strong><span>Full Stack</span></div>
-</div>
-      </div>
-    </div>
-    <div class="form-card">
-      <div class="form-header"><h3>Envie uma mensagem</h3></div>
-      <form id="contactForm">
-        <input type="hidden" name="access_key" value="d1d6f9b9-cd11-4c19-b627-d51c986a72d1">
-<input type="hidden" name="subject" value="Contato pelo site Alerta Rosa">
-<input type="hidden" name="from_name" value="Site Alerta Rosa">
-<input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
-        <div class="campo-contato"><label for="nome">Nome</label>
-          <input id="nome" name="nome" autocomplete="name" required></div>
-        <div class="campo-contato"><label for="email">E-mail</label>
-          <input id="email" name="email" type="email" autocomplete="email" required></div>
-        <div class="campo-contato"><label for="msg">Mensagem</label>
-          <textarea id="msg" name="msg" rows="5" maxlength="1500" required></textarea></div>
-         <button class="btn btn-contato" type="submit">Enviar mensagem</button>
-<p id="formStatus" class="form-status" role="status" aria-live="polite"></p>
-<p class="form-aviso">Este formulário não é canal de emergência: em perigo, ligue <a href="tel:190">190</a>, <a href="tel:180">180</a> ou <a href="tel:100">100</a>. Não envie dados sensíveis nem relatos de violência. A mensagem é enviada por um serviço de formulários e chega ao e-mail do projeto.</p>
-      </form>
-    </div>
-  </div>
-</div></section>
+    <footer class="foot mono"><span>© 2026 Alerta Rosa</span><a href="#home" data-link>Voltar ao topo ↑</a></footer>
+  </section>
 </main>
 
-<footer><div class="wrap"><p>© 2026 Alerta Rosa, projeto em desenvolvimento. Não substitui os serviços oficiais de emergência: <a href="tel:190">190</a>, <a href="tel:180">180</a> e <a href="tel:100">100</a>. <a href="#privacidade">Privacidade e LGPD</a></p></div></footer>
-<script src="app.js?v=3" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="main.js"></script>
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+<script src="rotas.js"></script>
 </body>
 </html>
