@@ -1,2 +1,6 @@
 ﻿.playwright-mcp/
 *.log
+# arquivos de trabalho (não fazem parte do site)
+*.blend
+*.blend1
+_backup*/

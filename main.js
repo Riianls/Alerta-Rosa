@@ -23,9 +23,16 @@ const low = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || innerWidth 
    THEME
    ========================================================= */
 const root = document.documentElement;
-let theme = 'branco';
-try { theme = localStorage.getItem('ar-theme') || 'branco'; } catch (e) {}
+// sem botão de tema: Início → Pilares ficam no tema rosa; da Biblioteca para baixo, tema branco
+let theme = 'rosa';
 root.dataset.theme = theme;
+try { localStorage.removeItem('ar-theme'); } catch (e) {}
+const setTheme = (t) => {
+  if (t === theme) return;
+  theme = t;
+  root.dataset.theme = t;
+  window.dispatchEvent(new CustomEvent('themechange', { detail: t }));
+};
 
 /* =========================================================
    SMOOTH SCROLL (Lenis + GSAP ticker)
@@ -43,7 +50,9 @@ if (!store.reduced && window.Lenis) {
 const scrollToTarget = (sel) => {
   const el = document.querySelector(sel);
   if (!el) return;
-  if (lenis) lenis.scrollTo(el, { duration: 1.8, easing: (t) => 1 - Math.pow(1 - t, 4) });
+  // desconta a altura do cabeçalho (logo + barra) para o título da seção não ficar escondido
+  const offset = sel === '#home' ? 0 : sel === '#work' ? 4 : -(document.querySelector('.top')?.offsetHeight || 0) + 20;
+  if (lenis) lenis.scrollTo(el, { offset, duration: 1.8, easing: (t) => 1 - Math.pow(1 - t, 4) });
   else el.scrollIntoView({ behavior: store.reduced ? 'auto' : 'smooth' });
 };
 document.querySelectorAll('[data-link]').forEach((a) =>
@@ -73,7 +82,7 @@ const LOGO_MATS = {
 };
 const LOGO_MAX_TURN = 0.45; // rotação máxima (rad) que as poses de rolagem aplicam ao logo
 const LOGO_SWAY = 0.35;    // amplitude do balanço contínuo (rad)
-const LOGO_MAX_X = 0.66;   // posição horizontal máxima do logo (1 = borda direita)
+const LOGO_MAX_X = 0.7;    // posição horizontal máxima do logo (1 = borda direita)
 const LOGO_TILT = 0.45;   // fração da inclinação (rx) das poses aplicada ao logo
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 const smooth = (t) => t * t * (3 - 2 * t);
@@ -86,18 +95,18 @@ const smooth = (t) => t * t * (3 - 2 * t);
 const DEF = { x: 0, y: 0, s: 1, rx: 0.4, ry: 0, rz: 0, presence: 1, spin: 1, video: 0, lib: 0, dock: 0, flip: 1, flow: 0, app: 0 };
 const POSES = {
   home: (i, m) => m ? { x: 0.1, y: 0.42, s: 0.56, rx: 0.5, ry: -0.6, rz: 0.16 }
-                    : { x: 0.62, y: 0.06, s: 0.8, rx: 0.46, ry: -0.6, rz: 0.16 },
+                    : { x: 0.7, y: 0.04, s: 0.66, rx: 0.46, ry: -0.6, rz: 0.16 },
   about: (i, m) => m ? { x: 0.9, y: 0.45, s: 0.5, rx: 1, ry: 1 + i }
-                     : { x: 1.0, y: 0.05 - i * 0.1, s: 1, rx: 1.05, ry: 0.4 + i * 1.4, rz: -0.25, spin: 0.4 },
+                     : { x: 1.0, y: 0.05 - i * 0.1, s: 0.74, rx: 1.05, ry: 0.4 + i * 1.4, rz: -0.25, spin: 0.4 },
   expertise: (i, m) => m ? { x: 0.75, y: 0.4, s: 0.42, rx: 0.3, ry: -0.5 + i * 1.2, spin: 0.25 }
-                         : { x: 0.56, y: -0.02, s: 0.78, rx: 0.3, ry: -0.6 + i * 1.1, spin: 0.25 },
+                         : { x: 0.7, y: -0.02, s: 0.6, rx: 0.3, ry: -0.6 + i * 1.1, spin: 0.25 },
   // durante o vídeo: pequeno, no canto, rachado (ver crack no tick)
   video: (i, m) => m ? { x: 0.58, y: -0.07, s: 0.26, rx: 0.3, ry: -0.4, spin: 0.2, video: 1 }
                      : { x: 0.66, y: -0.36, s: 0.34, rx: 0.3, ry: -0.5, spin: 0.2, video: 1 },
   // biblioteca: pousado no canto superior direito da capa em foco, olhando para ela (posição real no tick)
   work: () => ({ x: 0.6, y: 0.4, s: 0.4, rx: 0.15, ry: 0.25, rz: 0.2, spin: 0.08, lib: 1, flip: -1 }),
   // como funciona: o badalo sai e percorre os passos (ver flow no tick)
-  approach: (i, m) => ({ x: m ? 0.55 : 0.62, y: m ? 0.45 : 0.05, s: m ? 0.44 : 0.8, rx: 0.36, ry: -0.6 + i * 1.2, spin: 0.2, flow: 1 }),
+  approach: (i, m) => ({ x: m ? 0.55 : 0.7, y: m ? 0.45 : 0.05, s: m ? 0.44 : 0.62, rx: 0.36, ry: -0.6 + i * 1.2, spin: 0.2, flow: 1 }),
   // rotas: vira o ponto de partida do mapa (posição real calculada no tick)
   rotas: () => ({ x: 0.9, y: -0.3, s: 0.3, rx: 0.15, ry: 0, spin: 0.12, dock: 1 }),
   // contato: entra no celular que sobe da parte de baixo e toca dentro do app (posição real no tick)
@@ -150,37 +159,13 @@ function shockwave(x, y, k = 1, color = '#e3336d') {
 }
 function shake(k = 1) {
   if (store.reduced) return;
-  const els = [...document.querySelectorAll('.big, .hero__title, .contact__title, .section-head, .cols i, .layers li, .step')]
+  const els = [...document.querySelectorAll('.big, .hero__title, .contact__title, .section-head, .layers li, .step')]
     .filter((el) => { const r = el.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight; });
   els.forEach((el, i) => gsap.fromTo(el, { x: 0 }, { keyframes: { x: [0, -7 * k, 6 * k, -3 * k, 1.5 * k, 0] }, duration: 0.55, ease: 'power2.out', delay: i * 0.012, overwrite: 'auto' }));
 }
 
-/* =========================================================
-   TINTA ROSA (troca de tema): a tinta se espalha a partir do sino,
-   o tema troca por baixo dela e ela escorre para fora da tela
-   ========================================================= */
-function inkWave(x, y, onCovered) {
-  const el = document.createElement('div');
-  el.className = 'ink';
-  // escorridos irregulares na borda de cima (a tinta "agarra" na tela enquanto desce)
-  let d = 'M0 40 L0 30';
-  for (let i = 0, n = 26; i < n; i++) {
-    const x0 = (i / n) * 100, w = 100 / n, h = 30 - (4 + Math.random() * 26) * (Math.random() < 0.55 ? 1 : 0.25);
-    d += ` L${x0.toFixed(2)} 30 C${(x0 + w * 0.15).toFixed(2)} 30 ${(x0 + w * 0.2).toFixed(2)} ${h.toFixed(1)} ${(x0 + w * 0.5).toFixed(2)} ${h.toFixed(1)} C${(x0 + w * 0.8).toFixed(2)} ${h.toFixed(1)} ${(x0 + w * 0.85).toFixed(2)} 30 ${(x0 + w).toFixed(2)} 30`;
-  }
-  d += ' L100 40 Z';
-  el.innerHTML = `<svg class="ink__drips" viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true"><path d="${d}"/></svg>`;
-  document.body.append(el);
-  const R = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y)) + 60;
-  gsap.timeline({ onComplete: () => el.remove() })
-    .fromTo(el, { clipPath: `circle(0px at ${x}px ${y}px)` }, { clipPath: `circle(${R}px at ${x}px ${y}px)`, duration: 0.8, ease: 'power2.in' })
-    .add(onCovered)
-    .set(el, { clipPath: 'none' })
-    .to(el, { y: () => innerHeight * 1.5, duration: 1.25, ease: 'power2.in' }, '+=0.2');
-}
-
 /* ponte com o resto do site (rolagem, tema e mapa chamam o sino por aqui) */
-const bell = { ring() {}, screen: () => null, dive() {} };
+const bell = { ring() {}, screen: () => null };
 
 /* =========================================================
    THREE SCENE
@@ -243,7 +228,7 @@ function buildFlow() {
   flow.svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
   flow.svg.style.width = w + 'px'; flow.svg.style.height = h + 'px';
   // posição de layout (sem as animações de entrada), para a trilha não nascer torta
-  const pts = flow.steps.map((el) => [el.offsetLeft, el.offsetTop]);
+  const pts = flow.steps.map((el) => [el.offsetLeft + el.offsetWidth / 2, el.offsetTop]); // bolinha no centro de cada passo
   let d = `M${pts[0][0]} ${pts[0][1]}`;
   for (let i = 1; i < pts.length; i++) {
     const [x0, y0] = pts[i - 1], [x1, y1] = pts[i], my = (y0 + y1) / 2, flat = Math.abs(y1 - y0) < 10;
@@ -454,18 +439,8 @@ const sceneReady = new Promise(async (resolve) => {
   }
   bell.screen = () => (cur.presence > 0.3 && bellScr.x > 0 && bellScr.x < innerWidth && bellScr.y > 0 && bellScr.y < innerHeight) ? { x: bellScr.x, y: bellScr.y } : null;
 
-  /* ---------- 9. mergulho na tinta ---------- */
-  bell.dive = () => {
-    host.classList.add('is-ink');
-    gsap.timeline({ onComplete: () => host.classList.remove('is-ink') })
-      .to(st, { dive: 1, duration: 0.75, ease: 'power2.in' })
-      .add(() => { st.paint = 1; st.drip = 2.4; })
-      .to(st, { dive: 0, duration: 1.1, ease: 'back.out(1.6)' }, '+=0.2')
-      .to({}, { duration: 1.2 });
-  };
-
   /* clique no sino = tocar */
-  const interactive = 'a, button, input, label, select, textarea, .rotas__frame, .pill, .toggle';
+  const interactive = 'a, button, input, label, select, textarea, .rotas__frame, .pill';
   addEventListener('pointerdown', (e) => {
     if (e.target.closest(interactive)) return;
     if (Math.hypot(e.clientX - bellScr.x, e.clientY - bellScr.y) < bellScr.r) bell.ring(1);
@@ -488,6 +463,7 @@ const sceneReady = new Promise(async (resolve) => {
     });
   });
 
+  const vscrollEl = document.getElementById('vscroll');
   function tick() {
     const now = performance.now();
     const M = Math.min((now - last) / 1000, 0.05); last = now;
@@ -540,7 +516,11 @@ const sceneReady = new Promise(async (resolve) => {
     for (const k in cur) cur[k] += (T[k] - cur[k]) * (k === 'x' || k === 'y' || k === 's' || k === 'presence' ? ePos : E);
 
     // por cima do conteúdo no vídeo, na biblioteca e no mapa; atrás do texto no resto
-    const front = cur.video > 0.02 || cur.dock > 0.02 || cur.lib > 0.02 || st.travel || cur.app > 0.02;
+    // a seção do vídeo (faixa + ondas) fica acima do conteúdo: assim que ela entra na tela a camada 3D
+    // já vai para a frente, senão a faixa passa por cima da boneca por um instante
+    const vsr = vscrollEl ? vscrollEl.getBoundingClientRect() : null;
+    const vsOnScreen = !!vsr && vsr.top < innerHeight && vsr.bottom > 0;
+    const front = cur.video > 0.02 || cur.dock > 0.02 || cur.lib > 0.02 || st.travel || cur.app > 0.02 || vsOnScreen;
     // dentro do app ele toca sozinho de tempos em tempos
     if (cur.app > 0.9 && inPhone && cur.presence > 0.5) { st.appT -= M; if (st.appT <= 0) { bell.ring(0.7); st.appT = 2.8; } } else st.appT = 0.9;
     if (front !== st.front) { st.front = front; host.classList.toggle('is-front', front); }
@@ -702,7 +682,151 @@ const sceneReady = new Promise(async (resolve) => {
       }
     }
 
+    updateWoman(M, I, pxPerUnit);
     renderer.render(scene, camera);
+  }
+
+  /* ---------- GAROTA 3D (garota.glb: modelo enviado + camisa Alerta Rosa, editado no Blender) ----------
+     canto inferior esquerdo, inclinada na diagonal, da cintura para cima. Estados pela rolagem:
+       início ............ sorriso natural, tocando o sino do Alerta Rosa (o braço balança o sino)
+       sobre / pilares ... abaixa o braço (sem o sino) e coloca óculos redondos
+       vídeo ............. tira os óculos; raiva no rosto, olhando para o vídeo
+       biblioteca → contato: some
+       fim do contato .... volta com o mesmo sorriso, celular em pé com a tela para quem vê */
+  const girl = { root: new THREE.Group(), ready: false, mixer: null, acts: {}, cur: null, state: '', morphs: [],
+    show: 0, size: 1, ry: 0, blink: 2.5, blinkV: 0, nodes: {}, bellS: 1, glasses: 'off', move: null, bellScale: null };
+  scene.add(girl.root); girl.root.visible = false;
+  const SMILE = { mouthSmileLeft: 0.62, mouthSmileRight: 0.62, cheekSquintLeft: 0.32, cheekSquintRight: 0.32,
+                  eyeSquintLeft: 0.15, eyeSquintRight: 0.15, browInnerUp: 0.1, mouthDimpleLeft: 0.12, mouthDimpleRight: 0.12, jawOpen: 0.06 };
+  const FACES = {
+    sino: SMILE, oculos: SMILE, telefone: SMILE,
+    raiva: { browDownLeft: 1, browDownRight: 1, noseSneerLeft: 0.75, noseSneerRight: 0.75, eyeSquintLeft: 0.65, eyeSquintRight: 0.65,
+             mouthFrownLeft: 0.9, mouthFrownRight: 0.9, mouthPressLeft: 0.5, mouthPressRight: 0.5, mouthUpperUpLeft: 0.35, mouthUpperUpRight: 0.35,
+             cheekSquintLeft: 0.35, cheekSquintRight: 0.35, mouthShrugLower: 0.4, jawForward: 0.2 },
+  };
+  // tempos da animação "ColocaOculos" (24 qps): braço do sino desce até o quadro 9; óculos no rosto no 20; termina no 34
+  const F = (f) => (f - 1) / 24, T_ARM_DOWN = F(9), T_ON_FACE = F(20), T_END = F(34);
+  const GIRL_TOP = 1.83, GIRL_CUT = 0.92;
+  new GLTFLoader().loadAsync('garota.glb').then((gltf) => {
+    const m = gltf.scene;
+    m.traverse((o) => {
+      if (o.isMesh) {
+        o.frustumCulled = false;
+        if (o.material) o.material.envMapIntensity = 0.55;
+        if (o.morphTargetDictionary) girl.morphs.push(o);
+      }
+      if (['sino', 'oculos_rosto', 'oculos_mao', 'celular_corpo'].includes(o.name)) girl.nodes[o.name] = o;
+    });
+    m.position.y = -GIRL_CUT;
+    girl.root.add(m);
+    girl.mixer = new THREE.AnimationMixer(m);
+    gltf.animations.forEach((c) => { girl.acts[c.name] = girl.mixer.clipAction(c); });
+    const put = girl.acts.ColocaOculos;
+    if (put) { put.setLoop(THREE.LoopOnce, 1); put.clampWhenFinished = true; }
+    if (girl.nodes.sino) girl.bellScale = girl.nodes.sino.scale.clone();
+    ['oculos_rosto', 'oculos_mao', 'celular_corpo'].forEach((n) => { if (girl.nodes[n]) girl.nodes[n].visible = false; });
+    girl.ready = true;
+  }).catch((e) => console.warn('garota.glb indisponível', e));
+  const secTop = (sel) => { const el = document.querySelector(sel); return el ? el.getBoundingClientRect().top + scrollY : 1e9; };
+  function girlState() {
+    const y = scrollY, vh = innerHeight;
+    const maxY = document.documentElement.scrollHeight - vh;
+    if (y > maxY - vh * 0.45) return 'telefone';
+    if (y >= secTop('#work') - vh * 0.6) return '';
+    if (y >= secTop('#vscroll') - vh * 0.35) return 'raiva';
+    if (y >= vh * 0.6) return 'oculos';
+    return 'sino';
+  }
+  function play(name, fade = 0.4) {
+    const next = girl.acts[name];
+    if (!next) return null;
+    if (next === girl.cur) return next;
+    next.reset(); next.timeScale = 1; next.setEffectiveWeight(1).fadeIn(fade).play();
+    if (girl.cur) girl.cur.fadeOut(fade);
+    girl.cur = next; return next;
+  }
+  // pôr os óculos = animação para a frente; tirar = a mesma animação de trás para a frente
+  function glassesMove(dir) {
+    const a = girl.acts.ColocaOculos; if (!a) return;
+    if (girl.cur && girl.cur !== a) girl.cur.fadeOut(0.25);
+    a.reset(); a.setEffectiveWeight(1).fadeIn(0.25).play();
+    a.timeScale = dir; a.time = dir > 0 ? 0 : T_END;
+    girl.cur = a; girl.move = dir > 0 ? 'por' : 'tirar';
+  }
+  function setGirl(state) {
+    if (state === girl.state) return;
+    const prev = girl.state; girl.state = state;
+    if (!state) { girl.move = null; return; }
+    if (state === 'oculos') {
+      if (prev === 'sino') glassesMove(1);
+      else { play('Oculos'); girl.glasses = 'face'; girl.move = null; }
+    } else if (prev === 'oculos' && state === 'raiva' && girl.glasses === 'face' && !girl.move) {
+      glassesMove(-1); // tira os óculos antes de ficar com raiva
+    } else {
+      girl.move = null; girl.glasses = 'off';
+      play({ sino: 'Sino', raiva: 'Raiva', telefone: 'Telefone' }[state]);
+    }
+  }
+  function updateWoman(M, I, pxPerUnit) {
+    if (!girl.ready) return;
+    const state = innerWidth >= 900 ? girlState() : '';
+    setGirl(state);
+    girl.show += ((state ? 1 : 0) * I - girl.show) * (1 - Math.exp(-M * 5));
+    girl.root.visible = girl.show > 0.01;
+    if (!girl.root.visible) return;
+    girl.mixer.update(M);
+    const N = girl.nodes, put = girl.acts.ColocaOculos;
+    let bellTarget = state === 'sino' ? 1 : 0;
+    if (girl.move === 'por' && put) {
+      const t = put.time;
+      bellTarget = t < T_ARM_DOWN ? 1 - t / T_ARM_DOWN : 0;   // o sino some enquanto o braço desce
+      girl.glasses = t >= T_ON_FACE ? 'face' : 'hand';
+      if (t >= T_END - 0.01) { play('Oculos', 0.3); girl.move = null; }
+    } else if (girl.move === 'tirar' && put) {
+      const t = put.time;
+      girl.glasses = t >= T_ON_FACE ? 'face' : 'hand';
+      if (t <= T_ARM_DOWN + 0.02) { girl.glasses = 'off'; girl.move = null; play('Raiva', 0.35); }
+    }
+    if (N.oculos_rosto) N.oculos_rosto.visible = girl.glasses === 'face';
+    if (N.oculos_mao) N.oculos_mao.visible = girl.glasses === 'hand';
+    if (N.sino && girl.bellScale) {
+      girl.bellS += (bellTarget - girl.bellS) * (1 - Math.exp(-M * 10));
+      N.sino.visible = girl.bellS > 0.02;
+      N.sino.scale.copy(girl.bellScale).multiplyScalar(Math.max(0.001, girl.bellS));
+    }
+    if (N.celular_corpo) N.celular_corpo.visible = state === 'telefone';
+    // expressão: cada forma do rosto desliza até o valor do estado; piscadas automáticas
+    const target = FACES[state] || SMILE;
+    girl.blink -= M;
+    if (girl.blink <= 0) { girl.blinkV = 1; girl.blink = 2.4 + Math.random() * 3; }
+    girl.blinkV = Math.max(0, girl.blinkV - M * 7);
+    const blink = Math.sin(Math.min(1, girl.blinkV) * Math.PI);
+    const kf = 1 - Math.exp(-M * 5);
+    girl.morphs.forEach((mesh) => {
+      const dict = mesh.morphTargetDictionary, inf = mesh.morphTargetInfluences;
+      for (const name in dict) {
+        let v = target[name] || 0;
+        const isBlink = name === 'eyeBlinkLeft' || name === 'eyeBlinkRight';
+        if (isBlink) v = Math.max(v, blink);
+        const i = dict[name];
+        inf[i] += (v - inf[i]) * (isBlink ? 1 : kf);
+      }
+    });
+    // posição: canto inferior esquerdo, cintura abaixo da borda, inclinada na diagonal
+    girl.size += ((state === 'telefone' ? 1.12 : 1) - girl.size) * (1 - Math.exp(-M * 4));
+    const pxH = Math.min(innerHeight * 0.62, innerWidth * 0.34, 600) * girl.size;
+    const k = pxH / pxPerUnit / (GIRL_TOP - GIRL_CUT);
+    const sx = Math.max(pxH * 0.42, innerWidth * 0.13);
+    const sy = innerHeight + pxH * 0.06 + (1 - girl.show) * pxH * 1.1;
+    const p = toWorld(sx, sy);
+    girl.root.position.set(p.x, p.y, 1.2);
+    girl.root.scale.setScalar(k);
+    // no celular o ângulo fica fixo (0.22 rad de giro, -0.16 de inclinação): o aparelho foi montado no Blender
+    // com a rotação inversa, então aparece reto e de frente na tela
+    const phone = state === 'telefone';
+    const yaw = state === 'raiva' ? 0.5 : phone ? 0.22 : 0.3;
+    girl.ry += ((yaw + (phone ? 0 : st.px * 0.1)) - girl.ry) * (1 - Math.exp(-M * 3));
+    girl.root.rotation.set(0, girl.ry, -0.16 + (phone ? 0 : Math.sin(st.t * 0.9) * 0.012));
   }
 
   addEventListener('resize', () => {
@@ -750,27 +874,73 @@ document.querySelectorAll('.hero__line').forEach(splitChars);
 document.querySelectorAll('.split').forEach(splitWords);
 
 /* =========================================================
-   THEME TOGGLE
+   PALAVRAS FANTASMAS: lê data-ghosts de cada seção e cria as palavras
+   passando no fundo, cada uma num sentido diferente
    ========================================================= */
-const applyTheme = () => {
-  theme = theme === 'branco' ? 'rosa' : 'branco';
-  root.dataset.theme = theme;
-  try { localStorage.setItem('ar-theme', theme); } catch (e) {}
-  window.dispatchEvent(new CustomEvent('themechange', { detail: theme }));
+(() => {
+  const DIRS = ['ghostRight', 'ghostLeft', 'ghostUp', 'ghostDown', 'ghostDiag'];
+  document.querySelectorAll('[data-ghosts]').forEach((sec, si) => {
+    const words = sec.dataset.ghosts.split(',').map((w) => w.trim()).filter(Boolean);
+    const box = document.createElement('div'); box.className = 'ghosts'; box.setAttribute('aria-hidden', 'true');
+    words.forEach((w, i) => {
+      const el = document.createElement('span');
+      el.className = 'ghost' + (i % 3 === 1 ? ' ghost--serif' : '');
+      el.textContent = w;
+      const dir = DIRS[(i + si) % DIRS.length];
+      const vertical = dir === 'ghostUp' || dir === 'ghostDown';
+      const dur = 34 + ((i * 7 + si * 5) % 22);                       // 34–55 s, cada uma num ritmo
+      el.style.setProperty('--anim', dir);
+      el.style.setProperty('--dur', dur + 's');
+      el.style.setProperty('--delay', -((i * 11 + si * 3) % dur) + 's'); // já começam espalhadas
+      el.style.setProperty('--x', vertical ? (12 + (i * 23) % 76) + '%' : '0%');
+      el.style.setProperty('--y', vertical ? '50%' : (8 + (i * 19 + si * 7) % 78) + '%');
+      el.style.setProperty('--op', (0.05 + (i % 3) * 0.015).toFixed(3));
+      box.append(el);
+    });
+    sec.prepend(box);
+  });
+})();
+
+/* =========================================================
+   DOCK (barra de navegação + seletor de tema)
+   o "blob" desliza até o item ativo de forma elástica: a borda da frente
+   corre na direção do movimento e a de trás vem atrasada (estica e encolhe)
+   ========================================================= */
+const navDock = document.querySelector('.pill');
+function placeBlob(dock, target, instant) {
+  const blob = dock && dock.querySelector('.dock__blob');
+  if (!blob || !target) return;
+  const l = target.offsetLeft, r = dock.clientWidth - (target.offsetLeft + target.offsetWidth);
+  const prev = dock._blobL;
+  if (instant || prev == null || store.reduced) blob.style.transition = 'none';
+  else {
+    const toRight = l > prev;
+    const fast = '.36s cubic-bezier(.65,0,.25,1)', slow = '.6s cubic-bezier(.65,0,.25,1) .08s';
+    blob.style.transition = `left ${toRight ? slow : fast}, right ${toRight ? fast : slow}, background-color .5s`;
+  }
+  blob.style.setProperty('--bl', l + 'px');
+  blob.style.setProperty('--br', r + 'px');
+  dock._blobL = l;
+  if (blob.style.transition === 'none') { void blob.offsetWidth; requestAnimationFrame(() => { blob.style.transition = ''; }); }
+}
+function syncDocks(instant) {
+  placeBlob(navDock, navDock && navDock.querySelector('a.is-active'), instant);
+}
+syncDocks(true);
+if (document.fonts) document.fonts.ready.then(() => syncDocks(true));
+addEventListener('resize', () => syncDocks(true));
+
+// progresso da rolagem na base da barra + cabeçalho compacto depois do topo
+const dockBar = document.getElementById('dockProgress');
+let scrolledState = null;
+const onDockScroll = () => {
+  const max = document.documentElement.scrollHeight - innerHeight;
+  if (dockBar) dockBar.style.setProperty('--p', max > 0 ? clamp(scrollY / max).toFixed(4) : 0);
+  const s = scrollY > 40;
+  if (s !== scrolledState) { scrolledState = s; document.body.classList.toggle('is-scrolled', s); }
 };
-// ideia 9: a tinta sai do sino (ou do botão), cobre a tela, o tema troca por baixo e a tinta escorre
-let inking = false;
-const toggleBtn = document.getElementById('themeToggle');
-toggleBtn.addEventListener('click', () => {
-  if (store.reduced) return applyTheme();
-  if (inking) return;
-  inking = true;
-  const b = toggleBtn.getBoundingClientRect();
-  const o = bell.screen() || { x: b.left + b.width / 2, y: b.top + b.height / 2 };
-  bell.dive();
-  inkWave(o.x, o.y, applyTheme);
-  setTimeout(() => { inking = false; }, 2400);
-});
+addEventListener('scroll', onDockScroll, { passive: true });
+onDockScroll();
 
 /* layer hover */
 document.querySelectorAll('.layers li').forEach((li) => {
@@ -952,7 +1122,7 @@ function setupScroll() {
   if (!R) {
     gsap.to('.hero__title', { yPercent: -18, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
     gsap.to('.hero__foot', { opacity: 0, y: -40, ease: 'none', scrollTrigger: { trigger: '.hero', start: '60% top', end: 'bottom top', scrub: true } });
-    gsap.from('.contact__title', { scale: 0.92, transformOrigin: 'left bottom', ease: 'none',
+    gsap.from('.contact__title', { scale: 0.92, transformOrigin: 'center bottom', ease: 'none',
       scrollTrigger: { trigger: '.contact', start: 'top bottom', end: 'top 20%', scrub: true } });
   }
 
@@ -969,12 +1139,16 @@ function setupScroll() {
     mq.style.transform = `translate3d(${mx}px,0,0) skewX(${clamp(-vel * 0.25, -8, 8)}deg)`;
   });
 
+  // troca de tema pela rolagem: quando a Biblioteca chega ao topo, o site passa para o tema branco
+  ScrollTrigger.create({ trigger: '#work', start: 'top top',
+    onEnter: () => setTheme('branco'), onLeaveBack: () => setTheme('rosa') });
+
   // nav active state
   const links = [...document.querySelectorAll('.pill a')];
   document.querySelectorAll('[data-nav]').forEach((sec) => {
     const i = Number(sec.dataset.nav);
     ScrollTrigger.create({ trigger: sec, start: 'top 50%', end: 'bottom 50%',
-      onToggle: (self) => { if (self.isActive) links.forEach((a, k) => a.classList.toggle('is-active', k === i)); } });
+      onToggle: (self) => { if (self.isActive) { links.forEach((a, k) => a.classList.toggle('is-active', k === i)); syncDocks(); } } });
   });
 
   ScrollTrigger.addEventListener('refresh', () => { measure(); buildFlow(); });
@@ -995,7 +1169,7 @@ function heroIntro() {
     .fromTo('[data-in]', { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 1.2, stagger: 0.08 }, 0.7)
     .fromTo('.hero__rule', { scaleX: 0 }, { scaleX: 1, duration: 1.6, ease: 'expo.inOut' }, 0.4)
     .fromTo('.top', { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 1.2 }, 0.6)
-    .to('.pill, .toggle', { opacity: 1, duration: 1.2 }, 0.8)
+    .to('.pill', { opacity: 1, duration: 1.2 }, 0.8)
     .add(() => bell.ring(1), 1.9); // o sino toca quando o site termina de entrar
 
   // variable-font hover on hero letters
@@ -1013,7 +1187,7 @@ function heroIntro() {
       const d = Math.hypot(centers[i][0] - px, centers[i][1] - py), w = Math.max(0, 1 - d / rad) ** 2;
       vals[i] += (w - vals[i]) * 0.14;
       if (Math.abs(w - vals[i]) > 0.002 || vals[i] > 0.002)
-        c.style.fontVariationSettings = `'wdth' ${(106 + 19 * vals[i]).toFixed(1)}, 'wght' ${(800 + 100 * vals[i]).toFixed(0)}`;
+        c.style.fontVariationSettings = `'wdth' ${(82 + 18 * vals[i]).toFixed(1)}, 'wght' ${(700 + 100 * vals[i]).toFixed(0)}`;
     });
   });
 }
@@ -1044,7 +1218,7 @@ function runLoader() {
 gsap.set('.hero .char, [data-in], .hero__dot', { willChange: 'transform' });
 if (!store.reduced) {
   gsap.set('.hero .char', { yPercent: 118 });
-  gsap.set('[data-in], .top, .pill, .toggle', { opacity: 0 });
+  gsap.set('[data-in], .top, .pill', { opacity: 0 });
 }
 measure();
 runLoader();

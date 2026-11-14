@@ -1,13 +1,13 @@
 <!doctype html>
-<html lang="pt-BR" data-theme="branco">
+<html lang="pt-BR" data-theme="rosa">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Alerta Rosa</title>
-<meta name="description" content="Alerta Rosa — cuidado, informação e prevenção.">
+<meta name="description" content="Alerta Rosa — app de proteção às mulheres: botão SOS, rede de apoio e rotas seguras.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Fraunces:ital,opsz,wght,SOFT,WONK@1,9..144,300..700,0..100,0..1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script type="importmap">
 { "imports": {
@@ -29,82 +29,78 @@
 </div>
 
 <div class="grain" aria-hidden="true"></div>
-<div class="cols" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
 <div class="scene" id="scene" aria-hidden="true"></div>
 
-<!-- HEADER -->
+<!-- HEADER: logo no centro, barra de navegação logo abaixo -->
 <header class="top">
-  <a class="brand" href="#home" data-link>
+  <a class="brand" href="#home" data-link aria-label="Alerta Rosa — início">
     <img class="brand__logo" src="logo.webp" width="50" height="64" alt="">
-    <span class="mono brand__name">Alerta Rosa</span>
+    <span class="brand__name">Alerta <em class="serif">rosa</em></span>
   </a>
+
+  <!-- NAV: cápsula de vidro com indicador elástico + barra de progresso da rolagem -->
+  <nav class="pill dock" aria-label="Seções">
+    <span class="dock__blob" aria-hidden="true"></span>
+    <a href="#home" data-link class="is-active"><span class="dock__l">Início</span></a>
+    <a href="#about" data-link><span class="dock__l">Sobre</span></a>
+    <a href="#pilares" data-link><span class="dock__l">Funções</span></a>
+    <a href="#work" data-link><span class="dock__l">Biblioteca</span></a>
+    <a href="#rotas" data-link><span class="dock__l">Rotas</span></a>
+    <a href="#contact" data-link><span class="dock__l">Contato</span></a>
+    <span class="dock__bar" aria-hidden="true"><i id="dockProgress"></i></span>
+  </nav>
 </header>
 
-<!-- TEMA -->
-<button class="toggle mono" id="themeToggle" aria-label="Alternar tema">
-  <span class="t-a">Branco</span><span class="toggle__sw"><i></i></span><span class="t-b">Rosa</span>
-</button>
-
-<!-- NAV -->
-<nav class="pill" aria-label="Seções">
-  <a href="#home" data-link class="is-active" aria-label="Início"><span class="mono l">Início</span></a>
-  <a href="#about" data-link aria-label="Sobre"><span class="mono l">Sobre</span></a>
-  <a href="#pilares" data-link aria-label="Pilares"><span class="mono l">Pilares</span></a>
-  <a href="#work" data-link aria-label="Biblioteca"><span class="mono l">Biblioteca</span></a>
-  <a href="#rotas" data-link aria-label="Rotas"><span class="mono l">Rotas</span></a>
-  <a href="#contact" data-link aria-label="Contato"><span class="mono l">Contato</span></a>
-</nav>
 
 <main>
   <!-- HERO -->
-  <section id="home" class="hero" data-pose="home" data-nav="0">
+  <section id="home" class="hero" data-ghosts="Coragem,Empoderamento,Proteção,Liberdade,Sororidade" data-pose="home" data-nav="0">
     <h1 class="hero__title" aria-label="Alerta Rosa">
       <span class="hero__line" aria-hidden="true">ALERTA</span>
       <span class="hero__line hero__line--2" aria-hidden="true">ROSA<i class="hero__dot"></i></span>
     </h1>
     <div class="hero__rule rule"></div>
     <div class="hero__foot">
-      <p class="mono hero__role" data-in>Cuidado, informação<br>&amp; prevenção</p>
-      <p class="hero__tag" data-in>Transformo <em class="serif">atenção</em><br>em cuidado que salva.</p>
-      <a class="hero__scroll" href="#about" data-link data-in aria-label="Rolar para baixo"><span class="hero__scroll-line"></span></a>
+      <p class="mono hero__role" data-in>Proteção, acolhimento<br>&amp; segurança</p>
+      <p class="hero__tag" data-in>Nenhuma mulher <em class="serif">sozinha</em><br>diante da violência.</p>
     </div>
   </section>
 
   <!-- MARQUEE -->
   <div class="marquee" aria-hidden="true">
     <div class="marquee__track" id="marquee">
-      <span>Cuidar <em class="serif">é</em> prevenir</span><b>✦</b><span>Alerta Rosa</span><b>✦</b><span>Informação <em class="serif">que</em> protege</span><b>✦</b>
-      <span>Cuidar <em class="serif">é</em> prevenir</span><b>✦</b><span>Alerta Rosa</span><b>✦</b><span>Informação <em class="serif">que</em> protege</span><b>✦</b>
+      <span>Você <em class="serif">não</em> está sozinha</span><b>✦</b><span>Alerta Rosa</span><b>✦</b><span>Proteção <em class="serif">que</em> acolhe</span><b>✦</b>
+      <span>Você <em class="serif">não</em> está sozinha</span><b>✦</b><span>Alerta Rosa</span><b>✦</b><span>Proteção <em class="serif">que</em> acolhe</span><b>✦</b>
     </div>
   </div>
 
   <!-- SOBRE -->
-  <section id="about" class="section about" data-pose="about" data-nav="1">
+  <section id="about" class="section about" data-ghosts="Respeito,Dignidade,Voz,Acolhimento,Segurança" data-pose="about" data-nav="1">
     <div class="section-head mono"><span>Sobre</span></div>
     <div class="about__body">
-      <h2 class="big split">Um lembrete <em class="serif">rosa</em> de que o cuidado começa antes do problema.</h2>
+      <h2 class="big split">Existimos para que <em class="serif">nenhuma</em> mulher enfrente o medo sozinha.</h2>
       <div class="about__cols">
-        <p data-reveal>O Alerta Rosa reúne informação clara, acolhimento e tecnologia para que mais pessoas reconheçam sinais cedo e saibam onde buscar ajuda.</p>
-        <p data-reveal>Cada camada do projeto — conteúdo, rede de apoio, ferramentas digitais — se encaixa como peças de uma mesma pilha: sozinhas são frágeis, juntas sustentam.</p>
+        <p data-reveal>O Alerta Rosa é um aplicativo de proteção às mulheres. Ele nasceu de uma realidade que não dá para ignorar: muitas mulheres vivem situações de assédio, perseguição e violência e, na hora do perigo, não sabem a quem recorrer nem para onde ir.</p>
+        <p data-reveal>Por isso reunimos, num só lugar, um pedido de socorro rápido, uma rede de pessoas de confiança e o caminho até os pontos de apoio mais próximos. Tecnologia a serviço da segurança, do acolhimento e da liberdade de ir e vir.</p>
       </div>
       <dl class="stats">
-        <div data-reveal><dt class="mono dim">Pessoas alcançadas</dt><dd><span class="count" data-to="12000">0</span>+</dd></div>
-        <div data-reveal><dt class="mono dim">Parceiros</dt><dd><span class="count" data-to="48">0</span></dd></div>
-        <div data-reveal><dt class="mono dim">Ações realizadas</dt><dd><span class="count" data-to="320">0</span></dd></div>
+        <div data-reveal><dt class="mono dim">Toque para pedir ajuda</dt><dd><span class="count" data-to="1">0</span></dd></div>
+        <div data-reveal><dt class="mono dim">Horas por dia ao seu lado</dt><dd><span class="count" data-to="24">0</span>h</dd></div>
+        <div data-reveal><dt class="mono dim">Gratuito</dt><dd><span class="count" data-to="100">0</span>%</dd></div>
       </dl>
     </div>
   </section>
 
   <!-- PILARES -->
-  <section id="pilares" class="section pilares" data-pose="expertise" data-nav="2">
-    <div class="section-head mono"><span>Pilares</span></div>
-    <h2 class="big split">Cinco camadas, <em class="serif">uma</em> pilha.</h2>
+  <section id="pilares" class="section pilares" data-ghosts="SOS,Rede,Localização,Discrição,Direitos" data-pose="expertise" data-nav="2">
+    <div class="section-head mono"><span>Funções</span></div>
+    <h2 class="big split">Cinco funções, <em class="serif">uma</em> rede de proteção.</h2>
     <ol class="layers">
-      <li data-layer="4" data-reveal><span class="layers__t">Informação</span><span class="layers__d">Conteúdo direto, sem jargão, sobre sinais e prevenção.</span></li>
-      <li data-layer="3" data-reveal><span class="layers__t">Prevenção</span><span class="layers__d">Lembretes, autoexame e rotinas de acompanhamento.</span></li>
-      <li data-layer="2" data-reveal><span class="layers__t">Acolhimento</span><span class="layers__d">Escuta e orientação para quem precisa de apoio.</span></li>
-      <li data-layer="1" data-reveal><span class="layers__t">Tecnologia</span><span class="layers__d">Ferramentas digitais que aproximam pessoas e serviços.</span></li>
-      <li data-layer="0" data-reveal><span class="layers__t">Comunidade</span><span class="layers__d">Rede de parceiros, voluntários e profissionais.</span></li>
+      <li data-layer="4" data-reveal><span class="layers__t">Botão SOS</span><span class="layers__d">Um toque envia um alerta com sua localização em tempo real para seus contatos de confiança.</span></li>
+      <li data-layer="3" data-reveal><span class="layers__t">Rede de apoio</span><span class="layers__d">Cadastre pessoas de confiança que serão avisadas sempre que você precisar.</span></li>
+      <li data-layer="2" data-reveal><span class="layers__t">Rotas seguras</span><span class="layers__d">Mapa com delegacias, centros de atendimento à mulher, hospitais e o caminho até eles.</span></li>
+      <li data-layer="1" data-reveal><span class="layers__t">Informação</span><span class="layers__d">Seus direitos, a Lei Maria da Penha, tipos de violência e como denunciar, em linguagem simples.</span></li>
+      <li data-layer="0" data-reveal><span class="layers__t">Discrição</span><span class="layers__d">Saída rápida e uso discreto, para que o app não exponha você a quem não deve saber.</span></li>
     </ol>
   </section>
 
@@ -120,7 +116,7 @@
   </section>
 
   <!-- BIBLIOTECA (horizontal) -->
-  <section id="work" class="work" data-pose="work" data-nav="3">
+  <section id="work" class="work" data-theme="branco" data-pose="work" data-nav="3">
     <div class="work__pin">
       <div class="section-head mono"><span>Biblioteca</span></div>
       <div class="work__track" id="workTrack">
@@ -143,19 +139,19 @@
   </section>
 
   <!-- PROCESSO -->
-  <section id="approach" class="section approach" data-pose="approach" data-nav="3">
+  <section id="approach" class="section approach" data-ghosts="Cadastrar,Acionar,Alertar,Chegar,Juntas" data-theme="branco" data-pose="approach" data-nav="3">
     <div class="section-head mono"><span>Como funciona</span></div>
-    <h2 class="big split">Montado <em class="serif">camada</em> por camada.</h2>
+    <h2 class="big split">Ajuda em <em class="serif">poucos</em> toques.</h2>
     <div class="steps">
-      <div class="step" data-reveal><h3>Ouvir</h3><p>Entendemos a realidade de cada comunidade antes de agir.</p></div>
-      <div class="step" data-reveal><h3>Informar</h3><p>Traduzimos o essencial em linguagem simples e acessível.</p></div>
-      <div class="step" data-reveal><h3>Conectar</h3><p>Ligamos pessoas a serviços, profissionais e redes de apoio.</p></div>
-      <div class="step" data-reveal><h3>Acompanhar</h3><p>Seguimos junto, com lembretes e retorno contínuo.</p></div>
+      <div class="step" data-reveal><h3>Cadastre</h3><p>Crie sua conta e adicione seus contatos de confiança.</p></div>
+      <div class="step" data-reveal><h3>Acione</h3><p>Em perigo, toque no botão SOS — mesmo com a tela bloqueada.</p></div>
+      <div class="step" data-reveal><h3>Alerte</h3><p>Seus contatos recebem o aviso com sua localização em tempo real.</p></div>
+      <div class="step" data-reveal><h3>Chegue segura</h3><p>Siga a rota até o ponto de apoio mais próximo e receba orientação.</p></div>
     </div>
   </section>
 
   <!-- ROTAS SEGURAS -->
-  <section id="rotas" class="section rotas" data-pose="rotas" data-nav="4">
+  <section id="rotas" class="section rotas" data-ghosts="Caminho,Apoio,Refúgio,Destino,Confiança" data-theme="branco" data-pose="rotas" data-nav="4">
     <div class="section-head mono"><span>Rotas seguras</span></div>
     <h2 class="big split">Saiba <em class="serif">sempre</em> para onde ir em Maricá.</h2>
     <div class="rotas__grid">
@@ -165,7 +161,7 @@
       </div>
       <aside class="rotas__panel" data-reveal>
         <form class="rotas__search" id="rotasSearch" role="search">
-          <input id="rotasQ" type="search" placeholder="Buscar endereço ou bairro em Maricá" aria-label="Buscar endereço ou bairro em Maricá" autocomplete="off">
+          <input id="rotasQ" type="search" placeholder="Endereço ou bairro" aria-label="Buscar endereço ou bairro em Maricá" autocomplete="off">
           <button type="submit" aria-label="Buscar"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></button>
         </form>
         <fieldset class="rotas__legend">
@@ -179,17 +175,16 @@
         <button class="rotas__go" id="rotasGo" type="button"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/></svg>Traçar rotas seguras</button>
         <p class="rotas__hint">Clique no mapa ou arraste <span class="pin pin--origin pin--sm"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg></span> para definir o ponto de partida, ou use <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="2" x2="5" y1="12" y2="12"/><line x1="19" x2="22" y1="12" y2="12"/><line x1="12" x2="12" y1="2" y2="5"/><line x1="12" x2="12" y1="19" y2="22"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="3"/></svg> para usar sua localização. O mapa cobre apenas o município de Maricá.</p>
         <ol class="rotas__results" id="rotasResults"></ol>
-        <p class="rotas__emerg mono">Emergência <a href="tel:190">190 Polícia</a> <a href="tel:180">180 Mulher</a> <a href="tel:192">192 SAMU</a> <a href="tel:153">153 Guarda</a></p>
       </aside>
     </div>
   </section>
 
   <!-- CONTATO -->
-  <section id="contact" class="section contact" data-pose="contact" data-nav="5">
+  <section id="contact" class="section contact" data-ghosts="Fale,Conecte,Juntas,Rosa,Esperança" data-theme="branco" data-pose="contact" data-nav="5">
     <div class="section-head mono"><span>Contato</span></div>
     <h2 class="contact__title split">Acenda <em class="serif">o</em><br>alerta.</h2>
     <div class="contact__links">
-      <a class="contact__mail" href="mailto:seu@email.com" data-reveal>seu@email.com <span>↗</span></a>
+      <a class="contact__mail" href="mailto:alertarosaoficial@gmail.com" data-reveal>alertarosaoficial@gmail.com <span>↗</span></a>
     </div>
     <!-- celular do final: o sino 3D entra no app e toca -->
     <div class="phone-wrap" aria-hidden="true">
