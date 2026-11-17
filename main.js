@@ -873,33 +873,6 @@ function splitWords(el) {
 document.querySelectorAll('.hero__line').forEach(splitChars);
 document.querySelectorAll('.split').forEach(splitWords);
 
-/* =========================================================
-   PALAVRAS FANTASMAS: lê data-ghosts de cada seção e cria as palavras
-   passando no fundo, cada uma num sentido diferente
-   ========================================================= */
-(() => {
-  const DIRS = ['ghostRight', 'ghostLeft', 'ghostUp', 'ghostDown', 'ghostDiag'];
-  document.querySelectorAll('[data-ghosts]').forEach((sec, si) => {
-    const words = sec.dataset.ghosts.split(',').map((w) => w.trim()).filter(Boolean);
-    const box = document.createElement('div'); box.className = 'ghosts'; box.setAttribute('aria-hidden', 'true');
-    words.forEach((w, i) => {
-      const el = document.createElement('span');
-      el.className = 'ghost' + (i % 3 === 1 ? ' ghost--serif' : '');
-      el.textContent = w;
-      const dir = DIRS[(i + si) % DIRS.length];
-      const vertical = dir === 'ghostUp' || dir === 'ghostDown';
-      const dur = 34 + ((i * 7 + si * 5) % 22);                       // 34–55 s, cada uma num ritmo
-      el.style.setProperty('--anim', dir);
-      el.style.setProperty('--dur', dur + 's');
-      el.style.setProperty('--delay', -((i * 11 + si * 3) % dur) + 's'); // já começam espalhadas
-      el.style.setProperty('--x', vertical ? (12 + (i * 23) % 76) + '%' : '0%');
-      el.style.setProperty('--y', vertical ? '50%' : (8 + (i * 19 + si * 7) % 78) + '%');
-      el.style.setProperty('--op', (0.05 + (i % 3) * 0.015).toFixed(3));
-      box.append(el);
-    });
-    sec.prepend(box);
-  });
-})();
 
 /* =========================================================
    DOCK (barra de navegação + seletor de tema)
@@ -943,6 +916,23 @@ addEventListener('scroll', onDockScroll, { passive: true });
 onDockScroll();
 
 /* layer hover */
+/* A lista reserva de antemão o espaço da maior descrição aberta. Assim, abrir/fechar uma
+   função não muda a altura da página, e o ResizeObserver não dispara ScrollTrigger.refresh()
+   a cada frame da animação (era isso que derrubava o FPS ao passar o mouse). */
+const layersList = document.querySelector('.layers');
+const reserveLayers = () => {
+  if (!layersList) return;
+  layersList.style.height = '';
+  const open = layersList.querySelector('li.is-on');
+  if (open) open.classList.remove('is-on');
+  const d = Math.max(0, ...[...layersList.querySelectorAll('.layers__d')].map((el) => el.scrollHeight));
+  layersList.style.height = `${layersList.offsetHeight + d + 8}px`;
+  if (open) open.classList.add('is-on');
+};
+reserveLayers();
+if (document.fonts) document.fonts.ready.then(reserveLayers);
+let reserveT;
+addEventListener('resize', () => { clearTimeout(reserveT); reserveT = setTimeout(reserveLayers, 150); });
 document.querySelectorAll('.layers li').forEach((li) => {
   const n = Number(li.dataset.layer);
   li.addEventListener('mouseenter', () => { store.activeLayer = n; });
@@ -959,6 +949,19 @@ document.querySelectorAll('.layers li').forEach((li) => {
    ========================================================= */
 function setupScroll() {
   const R = store.reduced;
+
+  // mapa 3D de Maricá (decoração da seção Rotas; refreshPriority -1 = calcula depois do pin da Biblioteca): entra quase deitado e girado, vai se inclinando,
+  // ganha espessura, os pontos de apoio aparecem e a rota se desenha; depois segue girando devagar
+  const deco = document.querySelector('.rdeco__stage');
+  if (deco && !R) {
+    gsap.timeline({ scrollTrigger: { trigger: '#rotas', start: 'top bottom', end: 'top 10%', scrub: 1, refreshPriority: -1 } })
+      .fromTo(deco, { '--rx': '12deg', '--rz': '-20deg', '--ext': '0px', '--ty': '90px' },
+        { '--rx': '54deg', '--rz': '0deg', '--ext': '3.2px', '--ty': '0px', ease: 'none', duration: 1 }, 0)
+      .fromTo(deco.querySelectorAll('.rdeco__pin'), { scale: 0 }, { scale: 1, ease: 'back.out(3)', duration: 0.25, stagger: 0.006 }, 0.45)
+      .fromTo(deco.querySelector('.rdeco__route'), { strokeDashoffset: 1 }, { strokeDashoffset: 0, ease: 'none', duration: 0.35 }, 0.6);
+    gsap.fromTo(deco, { '--rz': '0deg' }, { '--rz': '14deg', ease: 'none', immediateRender: false,
+      scrollTrigger: { trigger: '#rotas', start: 'top 10%', end: 'bottom top', scrub: 1, refreshPriority: -1 } });
+  }
 
   // biblioteca horizontal
   const track = document.getElementById('workTrack');
@@ -1101,17 +1104,6 @@ function setupScroll() {
     });
   }
 
-  // como funciona: a seção fica fixada enquanto a bolinha percorre os passos (progresso = rolagem)
-  const appr = document.getElementById('approach');
-  if (appr) {
-    ScrollTrigger.create({
-      trigger: appr, pin: true, invalidateOnRefresh: true,
-      start: () => (appr.offsetHeight > innerHeight ? 'bottom bottom' : 'center center'),
-      end: () => '+=' + Math.round(innerHeight * 1.6),
-      onUpdate: (self) => { store.fprog = self.progress; },
-    });
-  }
-
   // o celular sobe da parte de baixo da tela no final
   if (document.querySelector('.phone')) {
     gsap.fromTo('.phone', { yPercent: 118 }, { yPercent: 0, ease: 'none',
@@ -1126,19 +1118,6 @@ function setupScroll() {
       scrollTrigger: { trigger: '.contact', start: 'top bottom', end: 'top 20%', scrub: true } });
   }
 
-  // marquee — velocity driven
-  const mq = document.getElementById('marquee');
-  let mx = 0, vel = 0;
-  const half = () => mq.scrollWidth / 2;
-  gsap.ticker.add(() => {
-    if (R) return;
-    const v = lenis ? lenis.velocity : 0;
-    vel += (v - vel) * 0.1;
-    mx -= 0.6 + Math.abs(vel) * 0.35;
-    const h = half(); if (h && -mx > h) mx += h;
-    mq.style.transform = `translate3d(${mx}px,0,0) skewX(${clamp(-vel * 0.25, -8, 8)}deg)`;
-  });
-
   // troca de tema pela rolagem: quando a Biblioteca chega ao topo, o site passa para o tema branco
   ScrollTrigger.create({ trigger: '#work', start: 'top top',
     onEnter: () => setTheme('branco'), onLeaveBack: () => setTheme('rosa') });
@@ -1152,7 +1131,12 @@ function setupScroll() {
   });
 
   ScrollTrigger.addEventListener('refresh', () => { measure(); buildFlow(); });
-  new ResizeObserver(() => ScrollTrigger.refresh()).observe(document.body);
+  // só recalcula quando a altura da página realmente muda e depois que ela para de mudar
+  let roT, roH = document.body.offsetHeight;
+  new ResizeObserver(() => {
+    clearTimeout(roT);
+    roT = setTimeout(() => { const h = document.body.offsetHeight; if (h !== roH) { roH = h; ScrollTrigger.refresh(); } }, 200);
+  }).observe(document.body);
   ScrollTrigger.refresh();
   measure();
 }
@@ -1165,7 +1149,6 @@ function heroIntro() {
   tl.to(store.intro, { v: 1, duration: 2.6, ease: 'expo.out' }, 0);
   if (store.reduced) { store.intro.v = 1; return; }
   tl.fromTo('.hero .char', { yPercent: 118, rotate: 6 }, { yPercent: 0, rotate: 0, duration: 1.5, stagger: 0.045 }, 0.05)
-    .fromTo('.hero__dot', { scale: 0 }, { scale: 1, duration: 0.9, ease: 'back.out(3)' }, 0.85)
     .fromTo('[data-in]', { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 1.2, stagger: 0.08 }, 0.7)
     .fromTo('.hero__rule', { scaleX: 0 }, { scaleX: 1, duration: 1.6, ease: 'expo.inOut' }, 0.4)
     .fromTo('.top', { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 1.2 }, 0.6)
@@ -1199,23 +1182,23 @@ function runLoader() {
     if (lenis) lenis.start();
   };
   if (store.reduced) { el.remove(); finish(); heroIntro(); return; }
-  // entrada: palavras sobem de dentro da máscara
-  gsap.fromTo(el.querySelectorAll('.loader__w'), { yPercent: 110, rotate: 4 },
-    { yPercent: 0, rotate: 0, duration: 1.1, ease: 'expo.out', stagger: 0.12, delay: 0.15 });
-  gsap.fromTo(el.querySelector('.loader__dot'), { scale: 0 }, { scale: 1, duration: 0.7, ease: 'back.out(3)', delay: 0.7 });
+  // A entrada e a saída da abertura são animações de CSS (só transform/opacity), que rodam
+  // fora da thread principal: não travam enquanto o three.js e os modelos 3D carregam.
+  // A entrada já começa pelo script curto no <head>, antes de este arquivo carregar.
+  el.classList.add('is-in');
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-  Promise.all([Promise.race([Promise.all([document.fonts.ready, sceneReady]), wait(4500)]), wait(1500)]).then(() => {
-    gsap.timeline()
-      .to(el.querySelectorAll('.loader__w, .loader__dot'), { yPercent: -110, duration: 0.6, ease: 'power3.in', stagger: 0.06 })
-      .add(() => { finish(); heroIntro(); }, '-=0.1')
-      // saída: cinco faixas rosa sobem em cascata, revelando o site
-      .to(el.querySelectorAll('.loader__stripes i'), { yPercent: -100, duration: 1, ease: 'expo.inOut', stagger: 0.07 }, '-=0.1')
-      .set(el, { pointerEvents: 'none' }, '-=0.6')
-      .add(() => el.remove());
+  const shown = window.__loaderT0 ? Math.max(0, 2100 - (performance.now() - window.__loaderT0)) : 2100;
+  Promise.all([Promise.race([Promise.all([document.fonts.ready, sceneReady]), wait(4500)]), wait(shown)]).then(async () => {
+    el.classList.add('is-out');                 // o texto some suavemente (0,45 s)
+    await wait(350);
+    finish(); heroIntro();
+    el.classList.add('is-leave');               // as cinco faixas sobem em cascata
+    await wait(700); el.style.pointerEvents = 'none';
+    await wait(700); el.remove();
   });
 }
 
-gsap.set('.hero .char, [data-in], .hero__dot', { willChange: 'transform' });
+gsap.set('.hero .char, [data-in]', { willChange: 'transform' });
 if (!store.reduced) {
   gsap.set('.hero .char', { yPercent: 118 });
   gsap.set('[data-in], .top, .pill', { opacity: 0 });

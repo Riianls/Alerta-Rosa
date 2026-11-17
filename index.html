@@ -7,7 +7,7 @@
 <meta name="description" content="Alerta Rosa — app de proteção às mulheres: botão SOS, rede de apoio e rotas seguras.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Fraunces:ital,opsz,wght,SOFT,WONK@1,9..144,300..700,0..100,0..1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Plus+Jakarta+Sans:wght@200..800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script type="importmap">
 { "imports": {
@@ -22,11 +22,17 @@
 <div class="loader" id="loader" role="status" aria-label="Carregando">
   <div class="loader__stripes" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
   <div class="loader__word" aria-hidden="true">
-    <span class="loader__mask"><span class="loader__w">Alerta</span></span>
-    <span class="loader__mask"><em class="loader__w loader__serif">rosa</em></span>
-    <i class="loader__dot"></i>
+    <span class="loader__mask"><img class="loader__w loader__logo" src="logo.webp" width="50" height="64" alt=""></span>
+    <span class="loader__mask"><span class="loader__w">Alerta <span class="loader__rosa">rosa</span></span></span>
   </div>
 </div>
+<script>
+  /* começa a animação da abertura assim que a fonte chega (ou em até 0,6 s), sem esperar o resto do site */
+  (() => {
+    const go = () => { const l = document.getElementById('loader'); if (l && !l.classList.contains('is-in')) { window.__loaderT0 = performance.now(); l.classList.add('is-in'); } };
+    if (document.fonts && document.fonts.load) Promise.race([document.fonts.load('700 100px "Bricolage Grotesque"', 'ALERTA ROSA'), new Promise((r) => setTimeout(r, 600))]).then(go, go); else go();
+  })();
+</script>
 
 <div class="grain" aria-hidden="true"></div>
 <div class="scene" id="scene" aria-hidden="true"></div>
@@ -35,10 +41,10 @@
 <header class="top">
   <a class="brand" href="#home" data-link aria-label="Alerta Rosa — início">
     <img class="brand__logo" src="logo.webp" width="50" height="64" alt="">
-    <span class="brand__name">Alerta <em class="serif">rosa</em></span>
+    <span class="brand__name">Alerta <span class="brand__rosa">rosa</span></span>
   </a>
 
-  <!-- NAV: cápsula de vidro com indicador elástico + barra de progresso da rolagem -->
+  <!-- NAV: links em linha com um sublinhado que desliza até a seção ativa -->
   <nav class="pill dock" aria-label="Seções">
     <span class="dock__blob" aria-hidden="true"></span>
     <a href="#home" data-link class="is-active"><span class="dock__l">Início</span></a>
@@ -57,7 +63,7 @@
   <section id="home" class="hero" data-ghosts="Coragem,Empoderamento,Proteção,Liberdade,Sororidade" data-pose="home" data-nav="0">
     <h1 class="hero__title" aria-label="Alerta Rosa">
       <span class="hero__line" aria-hidden="true">ALERTA</span>
-      <span class="hero__line hero__line--2" aria-hidden="true">ROSA<i class="hero__dot"></i></span>
+      <span class="hero__line hero__line--2" aria-hidden="true">ROSA</span>
     </h1>
     <div class="hero__rule rule"></div>
     <div class="hero__foot">
@@ -65,14 +71,6 @@
       <p class="hero__tag" data-in>Nenhuma mulher <em class="serif">sozinha</em><br>diante da violência.</p>
     </div>
   </section>
-
-  <!-- MARQUEE -->
-  <div class="marquee" aria-hidden="true">
-    <div class="marquee__track" id="marquee">
-      <span>Você <em class="serif">não</em> está sozinha</span><b>✦</b><span>Alerta Rosa</span><b>✦</b><span>Proteção <em class="serif">que</em> acolhe</span><b>✦</b>
-      <span>Você <em class="serif">não</em> está sozinha</span><b>✦</b><span>Alerta Rosa</span><b>✦</b><span>Proteção <em class="serif">que</em> acolhe</span><b>✦</b>
-    </div>
-  </div>
 
   <!-- SOBRE -->
   <section id="about" class="section about" data-ghosts="Respeito,Dignidade,Voz,Acolhimento,Segurança" data-pose="about" data-nav="1">
@@ -138,20 +136,36 @@
     </div>
   </section>
 
-  <!-- PROCESSO -->
-  <section id="approach" class="section approach" data-ghosts="Cadastrar,Acionar,Alertar,Chegar,Juntas" data-theme="branco" data-pose="approach" data-nav="3">
-    <div class="section-head mono"><span>Como funciona</span></div>
-    <h2 class="big split">Ajuda em <em class="serif">poucos</em> toques.</h2>
-    <div class="steps">
-      <div class="step" data-reveal><h3>Cadastre</h3><p>Crie sua conta e adicione seus contatos de confiança.</p></div>
-      <div class="step" data-reveal><h3>Acione</h3><p>Em perigo, toque no botão SOS — mesmo com a tela bloqueada.</p></div>
-      <div class="step" data-reveal><h3>Alerte</h3><p>Seus contatos recebem o aviso com sua localização em tempo real.</p></div>
-      <div class="step" data-reveal><h3>Chegue segura</h3><p>Siga a rota até o ponto de apoio mais próximo e receba orientação.</p></div>
-    </div>
-  </section>
-
   <!-- ROTAS SEGURAS -->
   <section id="rotas" class="section rotas" data-ghosts="Caminho,Apoio,Refúgio,Destino,Confiança" data-theme="branco" data-pose="rotas" data-nav="4">
+    <!-- mapa 3D decorativo de Maricá (gerado a partir de dados-marica.json): camadas de SVG empilhadas em 3D,
+         inclinadas e giradas conforme a rolagem -->
+    <div class="rotas__deco" aria-hidden="true">
+      <svg width="0" height="0" style="position:absolute"><defs><path id="rdecoShape" d="M20 344L23 353L48 369L46 362L50 356L64 352L73 351L160 352L193 354L262 364L289 364L305 362L324 355L350 348L399 340L505 332L633 325L659 323L685 322L760 315L815 317L827 319L830 321L833 328L836 330L838 329L844 331L847 327L850 329L854 325L857 324L862 319L861 315L863 313L863 310L862 306L864 303L862 301L862 299L863 293L867 291L877 286L897 280L963 268L962 263L980 222L970 218L966 210L950 192L939 186L935 183L928 182L921 185L918 188L909 193L903 191L898 199L891 200L884 197L877 200L872 198L868 194L873 187L882 181L879 174L874 171L870 162L873 148L876 141L873 128L875 121L874 115L881 106L882 103L888 102L894 92L898 91L902 86L912 78L917 72L917 67L902 65L898 61L892 58L878 58L873 55L857 59L851 56L847 58L840 58L837 58L833 62L827 62L823 60L823 58L819 54L818 44L809 49L799 50L797 51L793 51L785 53L778 53L769 46L769 43L764 39L759 38L758 31L753 31L751 28L751 26L746 20L740 23L736 20L735 25L731 30L727 33L717 34L710 36L709 39L702 44L698 49L694 49L680 45L677 40L668 34L668 29L653 25L649 27L640 29L635 33L627 36L619 41L602 38L580 43L579 49L572 53L549 61L545 61L544 62L535 67L524 69L513 67L505 75L501 77L499 90L489 92L485 97L472 99L469 98L457 102L453 101L451 99L443 98L441 99L438 103L436 110L432 113L429 112L422 112L421 106L415 101L405 100L398 92L391 96L380 96L373 91L363 88L355 94L339 98L332 103L325 114L313 119L306 115L278 125L273 125L268 127L261 126L251 133L235 142L190 156L193 174L205 170L221 169L219 173L216 176L207 179L204 182L197 183L193 194L183 202L156 212L142 221L141 224L141 228L137 230L127 240L126 245L119 257L105 266L103 271L97 278L90 281L83 282L78 288L75 288L70 291L65 299L54 301L51 304L51 309L48 314L50 317L39 319L27 327L27 338L20 344ZM256 490L259 491L266 482L264 482L260 484L256 490ZM270 475L271 475L274 471L275 473L278 472L281 468L282 465L281 465L288 459L285 458L294 453L296 449L294 448L291 449L291 447L284 454L283 459L278 460L275 463L270 475ZM306 447L308 446L307 445L306 447ZM308 445L309 445L309 444L308 445Z"/></defs></svg>
+      <div class="rdeco__stage" style="aspect-ratio:1000/513">
+      <svg class="rdeco__layer rdeco__side" style="--i:0" viewBox="0 0 1000 513"><use href="#rdecoShape"/></svg>
+      <svg class="rdeco__layer rdeco__side" style="--i:1" viewBox="0 0 1000 513"><use href="#rdecoShape"/></svg>
+      <svg class="rdeco__layer rdeco__side" style="--i:2" viewBox="0 0 1000 513"><use href="#rdecoShape"/></svg>
+      <svg class="rdeco__layer rdeco__side" style="--i:3" viewBox="0 0 1000 513"><use href="#rdecoShape"/></svg>
+      <svg class="rdeco__layer rdeco__side" style="--i:4" viewBox="0 0 1000 513"><use href="#rdecoShape"/></svg>
+      <svg class="rdeco__layer rdeco__side" style="--i:5" viewBox="0 0 1000 513"><use href="#rdecoShape"/></svg>
+      <svg class="rdeco__layer rdeco__side" style="--i:6" viewBox="0 0 1000 513"><use href="#rdecoShape"/></svg>
+      <svg class="rdeco__layer rdeco__side" style="--i:7" viewBox="0 0 1000 513"><use href="#rdecoShape"/></svg>
+      <svg class="rdeco__layer rdeco__side" style="--i:8" viewBox="0 0 1000 513"><use href="#rdecoShape"/></svg>
+      <svg class="rdeco__layer rdeco__top" style="--i:9" viewBox="0 0 1000 513">
+        <defs>
+          <linearGradient id="rdecoFill" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd1e0"/><stop offset="1" stop-color="#f58fb1"/></linearGradient>
+          <pattern id="rdecoGrid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#fff" stroke-width="1" opacity=".55"/></pattern>
+          <clipPath id="rdecoClip"><use href="#rdecoShape"/></clipPath>
+        </defs>
+        <use href="#rdecoShape" fill="url(#rdecoFill)"/>
+        <rect width="1000" height="513" fill="url(#rdecoGrid)" clip-path="url(#rdecoClip)"/>
+        <use href="#rdecoShape" fill="none" stroke="#e3336d" stroke-width="2.5" stroke-linejoin="round"/>
+        <path class="rdeco__route" d="M193 200Q355 110 518 228" pathLength="1"/><circle class="rdeco__start" cx="193" cy="200" r="7"/>
+        <circle class="rdeco__pin" cx="239" cy="185" r="6" fill="#5b3fd6"/><circle class="rdeco__pin" cx="507" cy="231" r="6" fill="#d98a00"/><circle class="rdeco__pin" cx="507" cy="230" r="6" fill="#d98a00"/><circle class="rdeco__pin" cx="351" cy="258" r="6" fill="#5b3fd6"/><circle class="rdeco__pin" cx="519" cy="210" r="6" fill="#d98a00"/><circle class="rdeco__pin" cx="581" cy="319" r="6" fill="#1d8fd1"/><circle class="rdeco__pin" cx="537" cy="325" r="6" fill="#5b3fd6"/><circle class="rdeco__pin" cx="197" cy="348" r="6" fill="#1d8fd1"/><circle class="rdeco__pin" cx="524" cy="214" r="6" fill="#5b3fd6"/><circle class="rdeco__pin" cx="252" cy="216" r="6" fill="#1d8fd1"/><circle class="rdeco__pin" cx="261" cy="151" r="6" fill="#1d8fd1"/><circle class="rdeco__pin" cx="56" cy="339" r="6" fill="#1d8fd1"/><circle class="rdeco__pin" cx="260" cy="354" r="6" fill="#0f9d77"/><circle class="rdeco__pin" cx="389" cy="244" r="6" fill="#1d8fd1"/><circle class="rdeco__pin" cx="545" cy="312" r="6" fill="#1d8fd1"/><circle class="rdeco__pin" cx="401" cy="241" r="6" fill="#0f9d77"/><circle class="rdeco__pin" cx="616" cy="280" r="6" fill="#1d8fd1"/><circle class="rdeco__pin" cx="252" cy="207" r="6" fill="#0f9d77"/><circle class="rdeco__pin" cx="544" cy="227" r="6" fill="#1d8fd1"/><circle class="rdeco__pin" cx="511" cy="265" r="6" fill="#1d8fd1"/><circle class="rdeco__pin" cx="532" cy="230" r="6" fill="#0f9d77"/><circle class="rdeco__pin" cx="537" cy="234" r="6" fill="#1d8fd1"/><circle class="rdeco__pin" cx="537" cy="234" r="6" fill="#1d8fd1"/><circle class="rdeco__pin" cx="566" cy="190" r="6" fill="#1d8fd1"/><circle class="rdeco__pin" cx="535" cy="233" r="6" fill="#1d8fd1"/><circle class="rdeco__pin" cx="534" cy="232" r="6" fill="#1d8fd1"/><circle class="rdeco__pin" cx="508" cy="224" r="6" fill="#1d8fd1"/><circle class="rdeco__pin" cx="566" cy="186" r="6" fill="#1d8fd1"/><circle class="rdeco__pin" cx="517" cy="192" r="6" fill="#1d8fd1"/><circle class="rdeco__pin" cx="521" cy="223" r="6" fill="#d98a00"/><circle class="rdeco__pin" cx="519" cy="193" r="6" fill="#5b3fd6"/><circle class="rdeco__pin" cx="536" cy="187" r="6" fill="#d98a00"/><circle class="rdeco__pin" cx="535" cy="188" r="6" fill="#d98a00"/><circle class="rdeco__pin" cx="134" cy="317" r="6" fill="#5b3fd6"/><circle class="rdeco__pin" cx="827" cy="317" r="6" fill="#d98a00"/><circle class="rdeco__pin" cx="804" cy="136" r="6" fill="#1d8fd1"/><circle class="rdeco__pin" cx="158" cy="337" r="6" fill="#d98a00"/><circle class="rdeco__pin" cx="435" cy="226" r="6" fill="#1d8fd1"/><circle class="rdeco__pin" cx="169" cy="253" r="6" fill="#1d8fd1"/><circle class="rdeco__pin" cx="518" cy="228" r="9" fill="#e3336d"/><circle class="rdeco__pin" cx="173" cy="342" r="6" fill="#1d8fd1"/><circle class="rdeco__pin" cx="544" cy="211" r="9" fill="#e3336d"/><circle class="rdeco__pin" cx="253" cy="208" r="9" fill="#e3336d"/><circle class="rdeco__pin" cx="705" cy="313" r="9" fill="#e3336d"/><circle class="rdeco__pin" cx="514" cy="214" r="9" fill="#e3336d"/><circle class="rdeco__pin" cx="531" cy="232" r="6" fill="#d98a00"/><circle class="rdeco__pin" cx="175" cy="330" r="6" fill="#d98a00"/><circle class="rdeco__pin" cx="390" cy="263" r="6" fill="#d98a00"/><circle class="rdeco__pin" cx="240" cy="218" r="6" fill="#d98a00"/><circle class="rdeco__pin" cx="731" cy="312" r="6" fill="#d98a00"/><circle class="rdeco__pin" cx="467" cy="199" r="6" fill="#d98a00"/><circle class="rdeco__pin" cx="244" cy="183" r="6" fill="#d98a00"/>
+      </svg>
+      </div>
+    </div>
     <div class="section-head mono"><span>Rotas seguras</span></div>
     <h2 class="big split">Saiba <em class="serif">sempre</em> para onde ir em Maricá.</h2>
     <div class="rotas__grid">
@@ -182,9 +196,11 @@
   <!-- CONTATO -->
   <section id="contact" class="section contact" data-ghosts="Fale,Conecte,Juntas,Rosa,Esperança" data-theme="branco" data-pose="contact" data-nav="5">
     <div class="section-head mono"><span>Contato</span></div>
-    <h2 class="contact__title split">Acenda <em class="serif">o</em><br>alerta.</h2>
-    <div class="contact__links">
-      <a class="contact__mail" href="mailto:alertarosaoficial@gmail.com" data-reveal>alertarosaoficial@gmail.com <span>↗</span></a>
+    <div class="contact__body">
+      <h2 class="contact__title split">Vamos <em class="serif">conversar?</em></h2>
+      <p class="contact__text" data-reveal>Tem alguma dúvida ou sugestão? Escreva para a gente.</p>
+      <a class="contact__mail" href="mailto:alertarosaoficial@gmail.com" data-reveal>alertarosaoficial@gmail.com</a>
+      <footer class="foot"><span class="foot__copy">© 2026 Alerta Rosa</span><a class="foot__top" href="#home" data-link>Voltar ao topo ↑</a></footer>
     </div>
     <!-- celular do final: o sino 3D entra no app e toca -->
     <div class="phone-wrap" aria-hidden="true">
@@ -197,7 +213,6 @@
         </div>
       </div>
     </div>
-    <footer class="foot mono"><span>© 2026 Alerta Rosa</span><a href="#home" data-link>Voltar ao topo ↑</a></footer>
   </section>
 </main>
 
